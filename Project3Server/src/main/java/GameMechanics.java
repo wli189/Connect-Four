@@ -18,7 +18,7 @@ public class GameMechanics {
     }
 
     public boolean makeMove(int col) {
-        // check if the col is out of range or the col is full
+        // Check if the col is out of range or the col is full
         if (col < 0 || col >= cols || isColumnFull(col)) return false;
 
         for (int row = rows - 1; row >= 0; row--) {

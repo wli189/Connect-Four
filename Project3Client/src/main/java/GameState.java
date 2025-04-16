@@ -7,7 +7,7 @@ public class GameState implements Serializable {
     private final String status; // "ONGOING", "WIN", "DRAW"
 
     public GameState(int[][] board, int currentPlayer, String status) {
-        this.board = deepCopy(board);
+        this.board = deepCopy(board);  // Deepcopy prevent accident change
         this.currentPlayer = currentPlayer;
         this.status = status;
     }

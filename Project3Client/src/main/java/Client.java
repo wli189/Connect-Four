@@ -25,7 +25,6 @@ public class Client extends Thread {
 		while (true) {
 			try {
 				Object obj = in.readObject();
-				System.out.println(obj);
 
 				if (obj instanceof GameState gameState) {
 					int[][] board = gameState.getBoard();
@@ -40,10 +39,8 @@ public class Client extends Thread {
 							System.out.println("Board updated in UI");
 
 							if (status.equals("WIN")) {
-								System.out.println("Showing win message for player " + currentPlayer);
 								controller.showEndMessage("Player " + currentPlayer + " wins!");
 							} else if (status.equals("DRAW")) {
-								System.out.println("Showing draw message");
 								controller.showEndMessage("It's a draw!");
 							}
 						} catch (Exception e) {
@@ -73,7 +70,6 @@ public class Client extends Thread {
 			Message moveMessage = new Message("MAKE_MOVE", String.valueOf(col));
 			out.writeObject(moveMessage);
 			out.flush();
-			System.out.println("Sent move: column " + col);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
