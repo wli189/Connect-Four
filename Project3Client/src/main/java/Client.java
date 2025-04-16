@@ -1,3 +1,6 @@
+import Gui.*;
+import Message.*;
+
 import javafx.application.Platform;
 import java.io.IOException;
 import java.io.ObjectInputStream;

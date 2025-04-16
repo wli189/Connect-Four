@@ -1,13 +1,16 @@
+import Game.*;
+import Message.*;
+
 import java.io.ObjectInputStream;
 import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 public class Server {
 	int count = 1;
 	ArrayList<ClientThread> clients = new ArrayList<>();
+	ArrayList<GameThread> games = new ArrayList<>();
 	TheServer server;
 	GameMechanics game = new GameMechanics();
 	Object gameLock = new Object();
@@ -126,14 +129,14 @@ public class Server {
 					GameState gameState = new GameState(board, game.getCurrentPlayer(), status);
 					for (ClientThread ct : clients) {
 						try {
-							System.out.println("Sending GameState to client #" + ct.count);
+							System.out.println("Sending Message.GameState to client #" + ct.count);
 							ct.out.writeObject(gameState);
 							ct.out.flush();
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					}
-					System.out.println("GameState sent to all clients");
+					System.out.println("Message.GameState sent to all clients");
 				}
 			} catch (Exception e) {
 				e.printStackTrace();

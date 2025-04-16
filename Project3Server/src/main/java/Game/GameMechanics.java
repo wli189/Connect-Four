@@ -1,3 +1,5 @@
+package Game;
+
 public class GameMechanics {
     private final int rows = 6;
     private final int cols = 7;
