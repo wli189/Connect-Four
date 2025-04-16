@@ -18,7 +18,11 @@ public class ClientLayout {
     private void handleStartButtonClick() throws Exception {
         System.out.println("Start Game clicked!");
         // Load the game layout
-        Parent root = FXMLLoader.load(getClass().getResource("gameLayout.fxml"));
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("gameLayout.fxml"));
+        Parent root = loader.load();
+
+        GameLayout controller = loader.getController();
+        GuiClient.setGameController(controller);
 
         // Get current window from the button
         Stage currentStage = (Stage) startButton.getScene().getWindow();

@@ -41,7 +41,18 @@ public class GuiClient extends Application{
 		primaryStage.show();
 		
 	}
-	
+
+	private static GameLayout gameController;
+
+	public static void setGameController(GameLayout controller) {
+		gameController = controller;
+	}
+
+	public static GameLayout getGameController() {
+		return gameController;
+	}
+
+
 
 
 

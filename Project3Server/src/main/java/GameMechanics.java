@@ -1,6 +1,6 @@
-public class gameMechanics {
-    private final int rows = 7;
-    private final int cols = 6;
+public class GameMechanics {
+    private final int rows = 6;
+    private final int cols = 7;
     private final int[][] board = new int[rows][cols];
 
     private int currentPlayer = 1;  // 1 for player 1, 2 for player 2
@@ -75,7 +75,7 @@ public class gameMechanics {
             }
         }
         // / direction
-        for (int row = 3; row <= rows; row++) {
+        for (int row = 3; row < rows; row++) {
             for (int col = 0; col <= cols - 4; col++) {
                 int player = board[row][col];
                 if (player != 0 &&
