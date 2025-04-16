@@ -94,11 +94,13 @@ public class Server {
 				int col = Integer.parseInt(message.toString());
 
 				synchronized (gameLock) {
+					// TODO only client 1 and 2 can player
 					if (game.getCurrentPlayer() != count) {
 						out.writeObject("ERROR:Not your turn");
 						out.flush();
 						return;
 					}
+
 					boolean valid = game.makeMove(col);
 					if (!valid) {
 						out.writeObject("ERROR:Invalid move");
@@ -106,7 +108,7 @@ public class Server {
 						return;
 					}
 
-					// check win status
+					// Check win status
 					boolean win = game.checkWin();
 					boolean draw = game.isDraw();
 					int[][] board = game.getBoard();
