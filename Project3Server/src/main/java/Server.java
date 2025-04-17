@@ -40,11 +40,14 @@ public class Server {
 							}
 						}
 
+						// Found a game
 						if (joinableGame != null) {
 							joinableGame.setPlayer2(c);
 							c.setGame(joinableGame, 2);
 							System.out.println("Paired client #" + count + " as Player 2");
-						} else {
+						}
+						// Create new game
+						else {
 							GameThread newGame = new GameThread(c);
 							games.add(newGame);
 							c.setGame(newGame, 1);
@@ -73,24 +76,31 @@ public class Server {
 			this.count = count;
 		}
 
+		// Set game for this client and assign player ID
 		void setGame(GameThread game, int playerID) {
 			this.gameThread = game;
 			this.playerID = playerID;
 		}
 
+		// Broadcast message to all clients
 		public void updateClients(Object message) {
 			for (ClientThread t : clients) {
 				try {
-					t.out.writeObject(message);
+					if (t.out != null) {
+						t.out.writeObject(message);
+					}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
 		}
 
+		// Send message to self
 		public void sendToSelf(String message) {
 			try {
-				out.writeObject(message);
+				if (out != null) {
+					out.writeObject(message);
+				}
 			} catch (Exception e) {
 				e.printStackTrace();
 			}
@@ -107,7 +117,17 @@ public class Server {
 				System.out.println("Streams not open");
 			}
 
+			// Notice that new client connected
 			updateClients("new client on server: client #" + count);
+
+			// Send player ID to client
+			if (playerID == 1) {
+				sendToSelf("PLAYER_ID: 1");
+			}
+
+			if (playerID == 2) {
+				sendToSelf("PLAYER_ID: 2");
+			}
 
 			while (true) {
 				try {
@@ -115,6 +135,7 @@ public class Server {
 					System.out.println("Client #" + count + " sent: " + data);
 
 					if (data instanceof Message message) {
+						// Handle move if the message is a move
 						if ("MAKE_MOVE".equals(message.getType())) {
 							handleMove(message);
 						}
@@ -129,7 +150,7 @@ public class Server {
 							ClientThread opponent = (playerID == 1) ? gameThread.player2 : gameThread.player1;
 							if (opponent != null) {
 								try {
-									opponent.sendToSelf("ERROR:Opponent disconnected");
+									opponent.sendToSelf("ERROR: Opponent disconnected \nBack to start a new game");
 								} catch (Exception ex) {
 									ex.printStackTrace();
 								}
@@ -148,19 +169,26 @@ public class Server {
 				int col = Integer.parseInt(message.toString());
 
 				synchronized (gameThread.gameLock) {
+					// Wait for opponent
 					if (gameThread.player2 == null) {
-						sendToSelf("ERROR:Waiting for opponent");
+						sendToSelf("ERROR: Waiting for opponent");
 						return;
 					}
 
+					// Check if it is your turn
 					if (gameThread.game.getCurrentPlayer() != playerID) {
-						sendToSelf("ERROR:Not your turn");
+						sendToSelf("ERROR: Not your turn");
 						return;
 					}
 
+					if (gameThread.game.getCurrentPlayer() == playerID) {
+						sendToSelf("SERVER: It is your turn");
+					}
+
+					// Make move
 					boolean valid = gameThread.game.makeMove(col);
 					if (!valid) {
-						sendToSelf("ERROR:Invalid move");
+						sendToSelf("ERROR: Invalid move");
 						return;
 					}
 

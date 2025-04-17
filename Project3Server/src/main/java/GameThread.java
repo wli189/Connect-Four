@@ -9,25 +9,30 @@ public class GameThread {
     private final int gameId;
     private static int gameCounter = 0;
 
+    // Constructor
     public GameThread(Server.ClientThread player1) {
         this.player1 = player1;
         this.gameId = ++gameCounter;
     }
 
+    // Set player 2
     public void setPlayer2(Server.ClientThread player2) {
         this.player2 = player2;
     }
 
+    // Get game ID
     public int getGameId() {
         return gameId;
     }
 
+    // Check if both players are connected
     public boolean isGameValid() {
         boolean player1Connected = player1 != null && !player1.connection.isClosed();
         boolean player2Connected = player2 == null || (player2 != null && !player2.connection.isClosed());
         return player1Connected && player2Connected;
     }
 
+    // Send game state to both players
     public void sendGameState() {
         boolean win = game.checkWin();
         boolean draw = game.isDraw();

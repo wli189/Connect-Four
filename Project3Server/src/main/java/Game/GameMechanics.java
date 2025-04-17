@@ -13,6 +13,7 @@ public class GameMechanics {
         currentPlayer = 1; // Player 1 starts
     }
 
+    // Getters
     public int getCurrentPlayer() {
         return currentPlayer;
     }
@@ -21,10 +22,7 @@ public class GameMechanics {
         return deepCopy(board);
     }
 
-    public boolean isColumnFull(int col) {
-        return board[0][col] != 0;
-    }
-
+    // Make a move
     public boolean makeMove(int col) {
         // Check if the col is out of range or the col is full
         if (col < 0 || col >= cols || isColumnFull(col)) return false;
@@ -42,6 +40,13 @@ public class GameMechanics {
         return checkHorizontal() || checkVertical() || checkDiagonal();
     }
 
+    // Helper functions
+    // Check if a column is full
+    public boolean isColumnFull(int col) {
+        return board[0][col] != 0;
+    }
+
+    // Check if there is a winning combination in the column
     public boolean checkHorizontal() {
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col <= cols - 4; col++) {
@@ -107,6 +112,7 @@ public class GameMechanics {
         currentPlayer = (currentPlayer == 1) ? 2 : 1;
     }
 
+    // Deep copy board
     private int[][] deepCopy(int[][] original) {
         int[][] copy = new int[original.length][];
         for (int i = 0; i < original.length; i++) {

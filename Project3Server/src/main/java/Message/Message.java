@@ -7,6 +7,7 @@ public class Message implements Serializable {
 
     String message, type;
 
+    // Constructor
     public Message(String input){
         message = input;
     }
@@ -16,6 +17,7 @@ public class Message implements Serializable {
         this.message = input;
     }
 
+    // Getters
     public String toString(){
         return message;
     }

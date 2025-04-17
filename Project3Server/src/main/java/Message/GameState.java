@@ -14,6 +14,7 @@ public class GameState implements Serializable {
         this.status = status;
     }
 
+    // Getters
     public int[][] getBoard() {
         return deepCopy(board);
     }
@@ -26,6 +27,7 @@ public class GameState implements Serializable {
         return status;
     }
 
+    // Deep copy board
     private int[][] deepCopy(int[][] original) {
         int[][] copy = new int[original.length][];
         for (int i = 0; i < original.length; i++) {

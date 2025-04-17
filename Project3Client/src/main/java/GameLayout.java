@@ -38,6 +38,7 @@ public class GameLayout {
                 int clickedCol = col;
                 circle.setOnMouseClicked(event -> {
                     handleColumnClick(clickedCol);
+                    messageLabel.setText("");  // Clear the message label
                 });
                 boardGrid.add(circle, col, row);
             }
@@ -45,8 +46,9 @@ public class GameLayout {
     }
 
     public void updateBoard(int[][] board) {
-        boardGrid.getChildren().clear(); // Clear previous board
+        boardGrid.getChildren().clear(); // Clear the previous board
 
+        // Draw the new board
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 Circle circle = new Circle(30);
@@ -62,6 +64,7 @@ public class GameLayout {
                 int clickedCol = col;
                 circle.setOnMouseClicked(event -> {
                     handleColumnClick(clickedCol);
+                    messageLabel.setText("");  // Clear the message label
                 });
 
                 boardGrid.add(circle, col, row);
@@ -95,6 +98,7 @@ public class GameLayout {
         currentStage.show();
     }
 
+    // Show a message when the game ends
     public void showEndMessage(String message) {
         Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
@@ -105,10 +109,12 @@ public class GameLayout {
         });
     }
 
+    // Show an error message
     public void showError(String error) {
         messageLabel.setText("Error: " + error);
     }
 
+    // Show a notice message
     public void showMessage(String message) {
         messageLabel.setText(message);
     }

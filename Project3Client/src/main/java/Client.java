@@ -29,6 +29,7 @@ public class Client extends Thread {
 			try {
 				Object obj = in.readObject();
 
+				// Handle game state update
 				if (obj instanceof GameState gameState) {
 					int[][] board = gameState.getBoard();
 					String status = gameState.getStatus();
@@ -54,16 +55,20 @@ public class Client extends Thread {
 							e.printStackTrace();
 						}
 					});
-				} else if (obj instanceof String message) {
-					System.out.println(message);
-					if (message.startsWith("ERROR:") || message.startsWith("PLAYER_ID:")) {
+				}
+				// Print out message from server
+				else if (obj instanceof String message) {
+//					System.out.println(message);
+					if (message.startsWith("ERROR:") || message.startsWith("PLAYER_ID:") || message.startsWith("SERVER:")) {
 						Platform.runLater(() -> {
 							try {
 								GameLayout controller = GuiClient.getGameController();
 								if (message.startsWith("ERROR:")) {
-									controller.showError(message.substring(6));
-								} else {
-									controller.showMessage("You are Player " + message.substring(10));
+									controller.showError(message.substring(7));
+								} else if (message.startsWith("PLAYER_ID:")){
+									controller.showMessage("You are Player " + message.substring(11) + "\nPlayer 1 goes first");
+								} else if (message.startsWith("SERVER:")) {
+									controller.showMessage(message.substring(8));
 								}
 							} catch (Exception e) {
 								e.printStackTrace();
@@ -78,6 +83,7 @@ public class Client extends Thread {
 		}
 	}
 
+	// Disconnect from server
 	public void disconnect() {
 		try {
 			if (in != null) in.close();
@@ -101,6 +107,7 @@ public class Client extends Thread {
 		}
 	}
 
+	// Send a move to the server
 	public void sendMove(int col) {
 		try {
 			Message moveMessage = new Message("MAKE_MOVE", String.valueOf(col));
