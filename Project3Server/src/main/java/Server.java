@@ -106,6 +106,17 @@ public class Server {
 			}
 		}
 
+		private void sendToOpponent(String message) {
+			ClientThread opponent = (playerID == 1) ? gameThread.player2 : gameThread.player1;
+			if (opponent != null) {
+				try {
+					opponent.sendToSelf(message);
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
+
 
 		public void run() {
 			try {
@@ -182,7 +193,7 @@ public class Server {
 					}
 
 					if (gameThread.game.getCurrentPlayer() == playerID) {
-						sendToSelf("SERVER: It is your turn");
+						sendToOpponent("SERVER: It is your turn");
 					}
 
 					// Make move
@@ -198,5 +209,6 @@ public class Server {
 				e.printStackTrace();
 			}
 		}
+
 	}
 }
