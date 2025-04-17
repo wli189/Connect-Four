@@ -60,14 +60,10 @@ public class Client extends Thread {
 						Platform.runLater(() -> {
 							try {
 								GameLayout controller = GuiClient.getGameController();
-								if (controller != null) {
-									if (message.startsWith("ERROR:")) {
-										controller.showError(message.substring(6));
-									} else {
-										controller.showMessage("You are Player " + message.substring(10));
-									}
+								if (message.startsWith("ERROR:")) {
+									controller.showError(message.substring(6));
 								} else {
-									System.err.println("GameLayout controller is null");
+									controller.showMessage("You are Player " + message.substring(10));
 								}
 							} catch (Exception e) {
 								e.printStackTrace();
@@ -79,6 +75,19 @@ public class Client extends Thread {
 				e.printStackTrace();
 				break;
 			}
+		}
+	}
+
+	public void disconnect() {
+		try {
+			if (in != null) in.close();
+			if (out != null) out.close();
+			if (socketClient != null && !socketClient.isClosed()) {
+				socketClient.close();
+			}
+
+		} catch (IOException e) {
+			e.printStackTrace();
 		}
 	}
 

@@ -1,10 +1,15 @@
 import javafx.application.Platform;
+import javafx.fxml.FXMLLoader;
+import javafx.scene.Parent;
+import javafx.scene.Scene;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Button;
 import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.fxml.FXML;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
+import javafx.stage.Stage;
 
 public class GameLayout {
     @FXML
@@ -12,6 +17,9 @@ public class GameLayout {
 
     @FXML
     private Label messageLabel;
+
+    @FXML
+    private Button backButton;
 
     private final int rows = 6;
     private final int cols = 7;
@@ -63,6 +71,28 @@ public class GameLayout {
     private void handleColumnClick(int col) {
         System.out.println("Clicked column: " + col);
         GuiClient.getClient().sendMove(col);
+    }
+
+    @FXML
+    private void handleBackButtonClick() throws Exception {
+        Client client = GuiClient.getClient();
+        if (client != null) {
+            client.disconnect(); // or whatever method you're using
+            GuiClient.setClient(null); // clear the reference if needed
+        }
+
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("clientLayout.fxml"));
+        Parent root = loader.load();
+
+        // Create a new scene with the previous scene layout
+        Scene previousScene = new Scene(root);
+
+        // Get current window from the button
+        Stage currentStage = (Stage) backButton.getScene().getWindow();
+
+        // Set the new scene on the same stage
+        currentStage.setScene(previousScene);
+        currentStage.show();
     }
 
     public void showEndMessage(String message) {

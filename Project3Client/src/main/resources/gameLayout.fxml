@@ -45,9 +45,10 @@
         </VBox>
 
         <!-- Error message-->
-        <Label fx:id="messageLabel" layoutX="80.0" layoutY="489.0" prefHeight="128.0" prefWidth="858.0" textFill="RED">
+        <Label fx:id="messageLabel" layoutX="80.0" layoutY="489.0" prefHeight="92.0" prefWidth="858.0" textFill="RED">
          <font>
             <Font name="System Bold" size="14.0" />
          </font></Label>
+      <Button fx:id="backButton" layoutX="489.0" layoutY="581.0" mnemonicParsing="false" onAction="#handleBackButtonClick" styleClass="button-style" text="Back" />
     </children>
 </AnchorPane>

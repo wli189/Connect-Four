@@ -32,7 +32,7 @@ public class GuiClient extends Application{
 	@Override
 	public void start(Stage primaryStage) throws Exception {
 		// Load the FXML file from the resources directory
-		FXMLLoader loader = new FXMLLoader(getClass().getResource("/clientLayout.fxml"));
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("clientLayout.fxml"));
 		Parent root = loader.load();
 
 		primaryStage.setScene(new Scene(root));
