@@ -6,6 +6,7 @@ import java.io.ObjectOutputStream;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.Objects;
 
 public class Server {
 	int count = 1;
@@ -87,7 +88,10 @@ public class Server {
 
 		// Get username for this client
 		private String getDisplayName() {
-			return username != null ? username : "Client #" + count;
+			if (username != null && !username.equals("")) {
+				return username;
+			}
+			return "Client #" + count;
 		}
 
 		// Broadcast message to all clients

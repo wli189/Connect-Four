@@ -52,6 +52,13 @@
     -fx-effect: dropshadow(gaussian, rgba(0, 128, 0, 0.5), 10, 0.5, 2, 2);
 }
 
+.send-button:hover {
+    -fx-background-color: #45a049;
+    -fx-effect: dropshadow(gaussian, rgba(0, 128, 0, 0.5), 10, 0.5, 2, 2);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
+}
+
 /* Start game scene button */
 .button-style {
     -fx-background-color: #4CAF50;
@@ -61,6 +68,13 @@
     -fx-background-radius: 10;
     -fx-font-family: "Arial";
     -fx-effect: dropshadow(gaussian, rgba(0, 128, 0, 0.5), 10, 0.5, 2, 2);
+}
+
+.button-style:hover {
+    -fx-background-color: #45a049;
+    -fx-effect: dropshadow(gaussian, rgba(0, 128, 0, 0.5), 10, 0.5, 2, 2);
+    -fx-scale-x: 1.05;
+    -fx-scale-y: 1.05;
 }
 
 /* Label styles */
