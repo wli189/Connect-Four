@@ -4,6 +4,7 @@ import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
 import javafx.application.Platform;
+import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
 public class ClientLayout {
@@ -15,8 +16,13 @@ public class ClientLayout {
     private Button quitButton;
 
     @FXML
+    private TextField usernameInput;
+
+    @FXML
     private void handleStartButtonClick() throws Exception {
+        String username = usernameInput.getText().trim();
         Client clientThread = new Client();
+        clientThread.setUsername(username);
         clientThread.start();
         GuiClient.setClient(clientThread);
 

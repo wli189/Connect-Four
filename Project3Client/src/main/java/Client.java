@@ -12,6 +12,7 @@ public class Client extends Thread {
 	ObjectOutputStream out;
 	ObjectInputStream in;
 	private boolean gameEnded = false;
+	private String username;
 
 	public void run() {
 		try {
@@ -20,6 +21,10 @@ public class Client extends Thread {
 			in = new ObjectInputStream(socketClient.getInputStream());
 			socketClient.setTcpNoDelay(true);
 			System.out.println("Client connected to server");
+
+			// Send username to server
+			out.writeObject("USERNAME:" + username);
+			out.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
 			return;
@@ -121,5 +126,10 @@ public class Client extends Thread {
 	// Reset game state for a new game
 	public void resetGame() {
 		gameEnded = false;
+	}
+
+	// Set the username for the client
+	public void setUsername(String username) {
+		this.username = username;
 	}
 }

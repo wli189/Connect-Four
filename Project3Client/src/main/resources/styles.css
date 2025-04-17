@@ -68,3 +68,9 @@
     -fx-font-family: "Arial Bold";
     -fx-font-size: 27px;
 }
+
+.username-box {
+    -fx-background-radius: 15;
+    -fx-font-size: 14px;
+    -fx-padding: 10;
+}

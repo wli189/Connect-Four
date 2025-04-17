@@ -70,16 +70,23 @@ public class Server {
 		public ObjectOutputStream out;
 		GameThread gameThread;
 		int playerID;
+		String username;
 
 		ClientThread(Socket s, int count){
 			this.connection = s;
 			this.count = count;
+			this.username = null;
 		}
 
 		// Set game for this client and assign player ID
 		void setGame(GameThread game, int playerID) {
 			this.gameThread = game;
 			this.playerID = playerID;
+		}
+
+		// Get username for this client
+		private String getDisplayName() {
+			return username != null ? username : "Client #" + count;
 		}
 
 		// Broadcast message to all clients
@@ -128,16 +135,30 @@ public class Server {
 				System.out.println("Streams not open");
 			}
 
+			try {
+				Object data = in.readObject();
+				if (data instanceof String message && message.startsWith("USERNAME:")) {
+					username = message.substring(9); // Extract username after "USERNAME:"
+					System.out.println("Client #" + count + " set username to: " + username);
+				} else {
+					System.err.println("Client #" + count + " did not send a valid username");
+					username = "Player" + count; // Fallback username
+				}
+			} catch (Exception e) {
+				System.err.println("Error receiving username from client #" + count + ": " + e.getMessage());
+				username = "Player" + count; // Fallback username
+			}
+
 			// Notice that new client connected
 			updateClients("new client on server: client #" + count);
 
 			// Send player ID to client
 			if (playerID == 1) {
-				sendToSelf("PLAYER_ID: 1");
+				sendToSelf("PLAYER_ID: 1 - " + getDisplayName());
 			}
 
 			if (playerID == 2) {
-				sendToSelf("PLAYER_ID: 2");
+				sendToSelf("PLAYER_ID: 2 - " + getDisplayName());
 			}
 
 			while (true) {
