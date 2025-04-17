@@ -1,7 +1,6 @@
-package Gui;
-
 import javafx.application.Platform;
 import javafx.scene.control.Alert;
+import javafx.scene.control.Label;
 import javafx.scene.layout.GridPane;
 import javafx.fxml.FXML;
 import javafx.scene.paint.Color;
@@ -10,6 +9,9 @@ import javafx.scene.shape.Circle;
 public class GameLayout {
     @FXML
     private GridPane boardGrid;
+
+    @FXML
+    private Label messageLabel;
 
     private final int rows = 6;
     private final int cols = 7;
@@ -71,5 +73,13 @@ public class GameLayout {
             alert.setContentText(message);
             alert.showAndWait();
         });
+    }
+
+    public void showError(String error) {
+        messageLabel.setText("Error: " + error);
+    }
+
+    public void showMessage(String message) {
+        messageLabel.setText(message);
     }
 }

@@ -1,4 +1,3 @@
-import Gui.*;
 import Message.*;
 
 import javafx.application.Platform;
@@ -12,6 +11,7 @@ public class Client extends Thread {
 	Socket socketClient;
 	ObjectOutputStream out;
 	ObjectInputStream in;
+	private boolean gameEnded = false;
 
 	public void run() {
 		try {
@@ -41,15 +41,39 @@ public class Client extends Thread {
 							controller.updateBoard(board);
 							System.out.println("Board updated in UI");
 
-							if (status.equals("WIN")) {
-								controller.showEndMessage("Player " + currentPlayer + " wins!");
-							} else if (status.equals("DRAW")) {
-								controller.showEndMessage("It's a draw!");
+							if (!gameEnded) {
+								if (status.equals("WIN")) {
+									controller.showEndMessage("Player " + currentPlayer + " wins!");
+									gameEnded = true; // Prevent further end messages
+								} else if (status.equals("DRAW")) {
+									controller.showEndMessage("It's a draw!");
+									gameEnded = true; // Prevent further end messages
+								}
 							}
 						} catch (Exception e) {
 							e.printStackTrace();
 						}
 					});
+				} else if (obj instanceof String message) {
+					System.out.println(message);
+					if (message.startsWith("ERROR:") || message.startsWith("PLAYER_ID:")) {
+						Platform.runLater(() -> {
+							try {
+								GameLayout controller = GuiClient.getGameController();
+								if (controller != null) {
+									if (message.startsWith("ERROR:")) {
+										controller.showError(message.substring(6));
+									} else {
+										controller.showMessage("You are Player " + message.substring(10));
+									}
+								} else {
+									System.err.println("GameLayout controller is null");
+								}
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						});
+					}
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -76,5 +100,10 @@ public class Client extends Thread {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
+	}
+
+	// Reset game state for a new game
+	public void resetGame() {
+		gameEnded = false;
 	}
 }

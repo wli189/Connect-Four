@@ -1,5 +1,3 @@
-package Gui;
-
 import javafx.application.Application;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -13,6 +11,10 @@ public class GuiClient extends Application{
 
 	public static Client getClient() {
 		return clientThread;
+	}
+
+	public static void setClient(Client client) {
+		clientThread = client;
 	}
 
 	public static void main(String[] args) {
@@ -29,9 +31,6 @@ public class GuiClient extends Application{
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		clientThread = new Client();
-		clientThread.start();
-
 		Parent root = FXMLLoader.load(getClass().getResource("clientLayout.fxml"));
 		primaryStage.setScene(new Scene(root));
 		primaryStage.setTitle("Connect Four");

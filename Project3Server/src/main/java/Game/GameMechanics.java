@@ -1,18 +1,24 @@
 package Game;
 
+import java.util.Arrays;
+
 public class GameMechanics {
     private final int rows = 6;
     private final int cols = 7;
-    private final int[][] board = new int[rows][cols];
+    private int[][] board;
+    private int currentPlayer;  // 1 for player 1, 2 for player 2
 
-    private int currentPlayer = 1;  // 1 for player 1, 2 for player 2
+    public GameMechanics() {
+        board = new int[rows][cols]; // Initialize a new board for this game
+        currentPlayer = 1; // Player 1 starts
+    }
 
     public int getCurrentPlayer() {
         return currentPlayer;
     }
 
     public int[][] getBoard() {
-        return board;
+        return deepCopy(board);
     }
 
     public boolean isColumnFull(int col) {
@@ -99,5 +105,13 @@ public class GameMechanics {
 
     public void switchPlayer() {
         currentPlayer = (currentPlayer == 1) ? 2 : 1;
+    }
+
+    private int[][] deepCopy(int[][] original) {
+        int[][] copy = new int[original.length][];
+        for (int i = 0; i < original.length; i++) {
+            copy[i] = Arrays.copyOf(original[i], original[i].length);;
+        }
+        return copy;
     }
 }

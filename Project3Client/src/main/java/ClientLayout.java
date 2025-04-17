@@ -1,5 +1,3 @@
-package Gui;
-
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -18,6 +16,10 @@ public class ClientLayout {
 
     @FXML
     private void handleStartButtonClick() throws Exception {
+        Client clientThread = new Client();
+        clientThread.start();
+        GuiClient.setClient(clientThread);
+
         System.out.println("Start Game clicked!");
         // Load the game layout
         FXMLLoader loader = new FXMLLoader(getClass().getResource("gameLayout.fxml"));
