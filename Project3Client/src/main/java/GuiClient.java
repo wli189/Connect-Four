@@ -31,11 +31,12 @@ public class GuiClient extends Application{
 
 	@Override
 	public void start(Stage primaryStage) throws Exception {
-		Parent root = FXMLLoader.load(getClass().getResource("clientLayout.fxml"));
+		// Load the FXML file from the resources directory
+		FXMLLoader loader = new FXMLLoader(getClass().getResource("/clientLayout.fxml"));
+		Parent root = loader.load();
+
 		primaryStage.setScene(new Scene(root));
-		primaryStage.setTitle("Connect Four");
 		primaryStage.show();
-		
 	}
 
 	private static GameLayout gameController;

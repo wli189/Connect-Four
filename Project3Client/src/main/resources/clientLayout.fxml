@@ -4,7 +4,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="400.0" prefWidth="600.0" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ClientLayout">
+<AnchorPane prefHeight="400.0" prefWidth="600.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ClientLayout">
    <children>
       <VBox alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20.0">
          <children>
@@ -15,16 +15,8 @@
             </Label>
             <HBox alignment="CENTER" prefHeight="100.0" prefWidth="200.0" spacing="50.0">
                <children>
-                  <Button fx:id="startButton" mnemonicParsing="false" onAction="#handleStartButtonClick" text="Start" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 18px; -fx-padding: 10 20 10 20; -fx-background-radius: 10;">
-                     <font>
-                        <Font name="Arial" size="18.0" />
-                     </font>
-                  </Button>
-                  <Button fx:id="quitButton" mnemonicParsing="false" onAction="#handleQuitButtonClick" text="Quit" style="-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-size: 18px; -fx-padding: 10 20 10 20; -fx-background-radius: 10;">
-                     <font>
-                        <Font name="Arial" size="18.0" />
-                     </font>
-                  </Button>
+                  <Button fx:id="startButton" mnemonicParsing="false" onAction="#handleStartButtonClick" styleClass="button-style" text="Start" />
+                  <Button fx:id="quitButton" mnemonicParsing="false" onAction="#handleQuitButtonClick" styleClass="button-style" text="Quit" />
                </children>
             </HBox>
          </children>
