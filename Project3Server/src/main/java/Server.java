@@ -29,6 +29,7 @@ public class Server {
 				while(true) {
 					ClientThread c = new ClientThread(mysocket.accept(), count);
 					clients.add(c);
+					// Protect the games list and make sure there is no concurrent modification
 					synchronized (games) {
 						// Pair clients
 						GameThread joinableGame = null;
@@ -177,6 +178,7 @@ public class Server {
 					updateClients("Client #" + count + " has left the server!");
 					clients.remove(this);
 					// Clean up game if any player dc
+					// Protect the games list and make sure there is no concurrent modification
 					synchronized (games) {
 						if (gameThread != null) {
 							ClientThread opponent = (playerID == 1) ? gameThread.player2 : gameThread.player1;
@@ -200,6 +202,7 @@ public class Server {
 			try {
 				int col = Integer.parseInt(message.toString());
 
+				// Protect the gameThread and make sure there is only one move at a time
 				synchronized (gameThread.gameLock) {
 					// Wait for opponent
 					if (gameThread.player2 == null) {
