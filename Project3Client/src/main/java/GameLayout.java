@@ -5,6 +5,8 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.scene.control.Label;
+import javafx.scene.control.TextField;
+import javafx.scene.control.TextArea;
 import javafx.scene.layout.GridPane;
 import javafx.fxml.FXML;
 import javafx.scene.paint.Color;
@@ -21,12 +23,22 @@ public class GameLayout {
     @FXML
     private Button backButton;
 
+    @FXML
+    private TextField chatInput;
+
+    @FXML
+    private TextArea chatOutput;
+
+    @FXML
+    private Button sendButton;
+
     private final int rows = 6;
     private final int cols = 7;
 
     @FXML
     public void initialize() {
         drawEmptyBoard(); // Draw an empty board before the first move
+        sendButton.setOnAction(e -> sendMessage());
     }
 
     public void drawEmptyBoard() {
@@ -96,6 +108,14 @@ public class GameLayout {
         // Set the new scene on the same stage
         currentStage.setScene(previousScene);
         currentStage.show();
+    }
+    // outputs the message on the message board
+    private void sendMessage() {
+        String message = chatInput.getText().trim();
+        if (!message.isEmpty()) {
+            chatOutput.appendText("Me: " + message + "\n"); // Display your message
+            chatInput.clear();
+        }
     }
 
     // Show a message when the game ends
