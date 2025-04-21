@@ -47,6 +47,9 @@ public class Server {
 							joinableGame.setPlayer2(c);
 							c.setGame(joinableGame, 2);
 							System.out.println("Paired client #" + count + " as Player 2");
+							if (joinableGame.player1 != null) {
+								joinableGame.player1.sendToSelf("SERVER: Player 2 has joined: " + c.getDisplayName());
+							}
 						}
 						// Create new game
 						else {
@@ -145,13 +148,9 @@ public class Server {
 				if (data instanceof String message && message.startsWith("USERNAME:")) {
 					username = message.substring(9); // Extract username after "USERNAME:"
 					System.out.println("Client #" + count + " set username to: " + username);
-				} else {
-					System.err.println("Client #" + count + " did not send a valid username");
-					username = "Player" + count; // Fallback username
 				}
 			} catch (Exception e) {
 				System.err.println("Error receiving username from client #" + count + ": " + e.getMessage());
-				username = "Player" + count; // Fallback username
 			}
 
 			// Notice that new client connected
@@ -188,7 +187,7 @@ public class Server {
 							ClientThread opponent = (playerID == 1) ? gameThread.player2 : gameThread.player1;
 							if (opponent != null) {
 								try {
-									opponent.sendToSelf("ERROR: Opponent disconnected \nBack to start a new game");
+									opponent.sendToSelf("SERVER: " + this.getDisplayName() + " disconnected \nBack to start a new game");
 								} catch (Exception ex) {
 									ex.printStackTrace();
 								}

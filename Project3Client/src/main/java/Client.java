@@ -70,9 +70,13 @@ public class Client extends Thread {
 								GameLayout controller = GuiClient.getGameController();
 								if (message.startsWith("ERROR:")) {
 									controller.showError(message.substring(7));
-								} else if (message.startsWith("PLAYER_ID:")){
-									controller.showMessage("You are Player " + message.substring(11) + "\nPlayer 1 goes first");
-								} else if (message.startsWith("SERVER:")) {
+								} else if (message.startsWith("PLAYER_ID:")) {
+                                    String player1Username = "";
+                                    if (message.substring(11, 12).equals("1")) {
+										player1Username = message.substring(15);
+                                    }
+                                    controller.showMessage("You are Player " + message.substring(11) + "\n" + player1Username + " goes first");
+                                } else if (message.startsWith("SERVER:")) {
 									controller.showMessage(message.substring(8));
 								}
 							} catch (Exception e) {
