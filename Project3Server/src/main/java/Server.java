@@ -29,7 +29,6 @@ public class Server {
 
 				while(true) {
 					ClientThread c = new ClientThread(mysocket.accept(), count);
-					clients.add(c);
 					// Protect the games list and make sure there is no concurrent modification
 					synchronized (games) {
 						// Pair clients
@@ -46,6 +45,7 @@ public class Server {
 						if (joinableGame != null) {
 							joinableGame.setPlayer2(c);
 							c.setGame(joinableGame, 2);
+							c.initialize();
 							System.out.println("Paired client #" + count + " as Player 2");
 							if (joinableGame.player1 != null) {
 								joinableGame.player1.sendToSelf("SERVER: Player 2 has joined: " + c.getDisplayName());
@@ -56,9 +56,11 @@ public class Server {
 							GameThread newGame = new GameThread(c);
 							games.add(newGame);
 							c.setGame(newGame, 1);
+							c.initialize();
 							System.out.println("No one waiting, created new game for client #" + count + " as Player 1");
 						}
 					}
+					clients.add(c);
 					c.start();
 					count++;
 				}
@@ -81,6 +83,25 @@ public class Server {
 			this.connection = s;
 			this.count = count;
 			this.username = null;
+		}
+
+		// Initialize client by reading username from client and send it to client
+		void initialize() {
+			try {
+				out = new ObjectOutputStream(connection.getOutputStream());
+				out.flush();
+				in = new ObjectInputStream(connection.getInputStream());
+				connection.setTcpNoDelay(true);
+
+				Object data = in.readObject();
+				if (data instanceof String message && message.startsWith("USERNAME:")) {
+					username = message.substring(9);
+					System.out.println("Client #" + count + " set username to: " + username);
+				}
+				sendToSelf("PLAYER_ID: " + playerID + " - " + getDisplayName()); // Send player ID to client
+			} catch (Exception e) {
+				System.err.println("Error initializing client #" + count + ": " + e.getMessage());
+			}
 		}
 
 		// Set game for this client and assign player ID
@@ -132,38 +153,9 @@ public class Server {
 			}
 		}
 
-
 		public void run() {
-			try {
-				in = new ObjectInputStream(connection.getInputStream());
-				out = new ObjectOutputStream(connection.getOutputStream());
-				connection.setTcpNoDelay(true);
-			}
-			catch(Exception e) {
-				System.out.println("Streams not open");
-			}
-
-			try {
-				Object data = in.readObject();
-				if (data instanceof String message && message.startsWith("USERNAME:")) {
-					username = message.substring(9); // Extract username after "USERNAME:"
-					System.out.println("Client #" + count + " set username to: " + username);
-				}
-			} catch (Exception e) {
-				System.err.println("Error receiving username from client #" + count + ": " + e.getMessage());
-			}
-
 			// Notice that new client connected
 			updateClients("new client on server: client #" + count);
-
-			// Send player ID to client
-			if (playerID == 1) {
-				sendToSelf("PLAYER_ID: 1 - " + getDisplayName());
-			}
-
-			if (playerID == 2) {
-				sendToSelf("PLAYER_ID: 2 - " + getDisplayName());
-			}
 
 			while (true) {
 				try {
@@ -177,6 +169,7 @@ public class Server {
 						}
 						if ("CHAT".equals(message.getType())) {
 							sendChatToOpponent(message);
+							System.out.println(message.toString());
 						}
 					}
 				} catch (Exception e) {

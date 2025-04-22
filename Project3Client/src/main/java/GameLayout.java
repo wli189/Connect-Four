@@ -116,7 +116,7 @@ public class GameLayout {
         if (!message.isEmpty()) {
             chatOutput.appendText(client.getUsername() + ": " + message + "\n"); // Display your message
             chatInput.clear();
-            System.out.println(client.getUsername() + ": " + message);
+//            System.out.println(client.getUsername() + ": " + message);
             GuiClient.getClient().sendUserMessage(client.getUsername() + ": " + message + "\n");
         }
     }
@@ -135,13 +135,9 @@ public class GameLayout {
         });
     }
 
-    // Show an error message
-    public void showError(String error) {
-        messageLabel.setText("Error: " + error);
-    }
-
     // Show a notice message
     public void showMessage(String message) {
+        System.out.println(message);
         messageLabel.setText(message);
     }
 }

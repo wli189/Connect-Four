@@ -5,7 +5,7 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="700.0" prefWidth="1000.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/11.0.14-internal" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GameLayout">
+<AnchorPane prefHeight="700.0" prefWidth="1000.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GameLayout">
     <children>
         <!-- Game Board Pane -->
         <Pane layoutX="80.0" layoutY="55.0" prefHeight="417.0" prefWidth="468.0" styleClass="board-pane">
@@ -28,7 +28,10 @@
         <!-- Chat UI -->
         <VBox fx:id="chatBox" layoutX="583.0" layoutY="55.0" prefHeight="417.0" prefWidth="351.0" spacing="10" styleClass="chat-box">
             <!-- Output Area -->
-            <TextArea fx:id="chatOutput" editable="false" prefHeight="320.0" prefWidth="341.0" promptText="Chat messages..." styleClass="chat-output" wrapText="true" />
+            <TextArea fx:id="chatOutput" editable="false" prefHeight="320.0" prefWidth="341.0" promptText="Chat messages..." styleClass="chat-output" wrapText="true">
+            <font>
+               <Font name="Arial" size="18.0" />
+            </font></TextArea>
 
             <!-- Input Area- -->
             <HBox alignment="CENTER" prefHeight="91.0" prefWidth="347.0" spacing="5">

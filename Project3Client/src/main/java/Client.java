@@ -13,6 +13,15 @@ public class Client extends Thread {
 	ObjectInputStream in;
 	private boolean gameEnded = false;
 	private String username;
+	private String player1Username;
+	private String player2Username;
+	private int playerID;
+
+	public Client() {
+		this.username = "";
+		this.player1Username = "";
+		this.player2Username = "";
+	}
 
 	public void run() {
 		try {
@@ -80,13 +89,18 @@ public class Client extends Thread {
 							try {
 								GameLayout controller = GuiClient.getGameController();
 								if (message.startsWith("ERROR:")) {
-									controller.showError(message.substring(7));
+									controller.showMessage(message.substring(7));
 								} else if (message.startsWith("PLAYER_ID:")) {
-                                    String player1Username = "";
-                                    if (message.substring(11, 12).equals("1")) {
-										player1Username = message.substring(15);
-                                    }
-                                    controller.showMessage("You are Player " + message.substring(11) + "\n" + player1Username + " goes first");
+									// Parse out the player ID and username from server
+									String[] parts = message.split(" - ", 2);
+									String id = parts[0].substring(11);
+									playerID = Integer.parseInt(id.trim());
+									if (playerID == 1) {
+										player1Username = parts[1];
+									} else if (playerID == 2) {
+										player2Username = parts[1];
+									}
+                                    controller.showMessage("You are Player " + playerID + " - " + this.getUsername() + "\n" + player1Username + " goes first");
                                 } else if (message.startsWith("SERVER:")) {
 									controller.showMessage(message.substring(8));
 								}
@@ -122,7 +136,7 @@ public class Client extends Thread {
 			Message chatMessage = new Message("CHAT", data);
 			out.writeObject(chatMessage);
 			out.flush();
-			System.out.println("Sent String: " + data);
+//			System.out.println("Sent String: " + data);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
@@ -150,5 +164,13 @@ public class Client extends Thread {
 		this.username = username;
 	}
 
-	public String getUsername() {return this.username;}
+	public String getUsername() {
+		if (playerID == 1) {
+			return player1Username;
+		} else if (playerID == 2) {
+			return player2Username;
+		} else {
+			return null;
+		}
+	}
 }
