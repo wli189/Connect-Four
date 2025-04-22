@@ -96,7 +96,7 @@ public class Server {
 				Object data = in.readObject();
 				if (data instanceof String message && message.startsWith("USERNAME:")) {
 					username = message.substring(9);
-					System.out.println("Client #" + count + " set username to: " + username);
+//					System.out.println("Client #" + count + " set username to: " + username);
 				}
 				sendToSelf("PLAYER_ID: " + playerID + " - " + getDisplayName()); // Send player ID to client
 			} catch (Exception e) {
@@ -169,7 +169,7 @@ public class Server {
 						}
 						if ("CHAT".equals(message.getType())) {
 							sendChatToOpponent(message);
-							System.out.println(message.toString());
+//							System.out.println(message.toString());
 						}
 					}
 				} catch (Exception e) {
