@@ -111,11 +111,17 @@ public class GameLayout {
     }
     // outputs the message on the message board
     private void sendMessage() {
+        Client client = GuiClient.getClient();
         String message = chatInput.getText().trim();
         if (!message.isEmpty()) {
-            chatOutput.appendText("Me: " + message + "\n"); // Display your message
+            chatOutput.appendText(client.getUsername() + ": " + message + "\n"); // Display your message
             chatInput.clear();
+            System.out.println(client.getUsername() + ": " + message);
+            GuiClient.getClient().sendUserMessage(client.getUsername() + ": " + message + "\n");
         }
+    }
+    public void receiveMessage(String message) {
+        Platform.runLater(() -> chatOutput.appendText(message));
     }
 
     // Show a message when the game ends

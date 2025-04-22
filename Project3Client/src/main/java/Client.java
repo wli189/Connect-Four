@@ -60,6 +60,17 @@ public class Client extends Thread {
 							e.printStackTrace();
 						}
 					});
+
+				}
+				// gets the users message to send to the other player
+				else if (obj instanceof Message message) {
+					if ("CHAT".equals(message.getType())) {
+						String chatText = message.toString();  // message that was sent
+						Platform.runLater(() -> {
+							GameLayout controller = GuiClient.getGameController();
+							controller.receiveMessage(chatText);
+						});
+					}
 				}
 				// Print out message from server
 				else if (obj instanceof String message) {
@@ -106,15 +117,17 @@ public class Client extends Thread {
 		}
 	}
 
-	public void send(String data) {
+	public void sendUserMessage(String data) {
 		try {
-			out.writeObject(data);
+			Message chatMessage = new Message("CHAT", data);
+			out.writeObject(chatMessage);
 			out.flush();
 			System.out.println("Sent String: " + data);
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 	}
+
 
 	// Send a move to the server
 	public void sendMove(int col) {
@@ -136,4 +149,6 @@ public class Client extends Thread {
 	public void setUsername(String username) {
 		this.username = username;
 	}
+
+	public String getUsername() {return this.username;}
 }

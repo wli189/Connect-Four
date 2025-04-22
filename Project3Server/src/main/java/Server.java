@@ -111,7 +111,7 @@ public class Server {
 		}
 
 		// Send message to self
-		public void sendToSelf(String message) {
+		public void sendToSelf(Object message) {
 			try {
 				if (out != null) {
 					out.writeObject(message);
@@ -175,6 +175,9 @@ public class Server {
 						if ("MAKE_MOVE".equals(message.getType())) {
 							handleMove(message);
 						}
+						if ("CHAT".equals(message.getType())) {
+							sendChatToOpponent(message);
+						}
 					}
 				} catch (Exception e) {
 					System.err.println("OOOOPPs...Something wrong with the socket from client: " + count + "....closing down!");
@@ -200,7 +203,16 @@ public class Server {
 				}
 			}
 		}
-
+		private void sendChatToOpponent(Message message) {
+			ClientThread opponent = (playerID == 1) ? gameThread.player2 : gameThread.player1;
+			if (opponent != null) {
+				try {
+					opponent.sendToSelf(message);  // Send the chat message to the opponent
+				} catch (Exception e) {
+					e.printStackTrace();
+				}
+			}
+		}
 		private void handleMove(Message message) {
 			try {
 				int col = Integer.parseInt(message.toString());
