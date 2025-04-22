@@ -83,8 +83,8 @@ public class Client extends Thread {
 				}
 				// Print out message from server
 				else if (obj instanceof String message) {
-//					System.out.println(message);
-					if (message.startsWith("ERROR:") || message.startsWith("PLAYER_ID:") || message.startsWith("SERVER:")) {
+					System.out.println(message);
+					if (message.startsWith("ERROR:") || message.startsWith("PLAYER_ID:") || message.startsWith("SERVER:") || message.startsWith("OPPONENT_PLAYER_USERNAME:")) {
 						Platform.runLater(() -> {
 							try {
 								GameLayout controller = GuiClient.getGameController();
@@ -101,8 +101,11 @@ public class Client extends Thread {
 										player2Username = parts[1];
 									}
                                     controller.showMessage("You are Player " + playerID + " - " + this.getUsername() + "\n" + player1Username + " goes first");
+									controller.showUsername(this.getUsername());
                                 } else if (message.startsWith("SERVER:")) {
 									controller.showMessage(message.substring(8));
+								} else if (message.startsWith("OPPONENT_PLAYER_USERNAME:")) {
+									player1Username = message.substring(26);
 								}
 							} catch (Exception e) {
 								e.printStackTrace();

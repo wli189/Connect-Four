@@ -32,6 +32,9 @@ public class GameLayout {
     @FXML
     private Button sendButton;
 
+    @FXML
+    private Label usernameLabel;
+
     private final int rows = 6;
     private final int cols = 7;
 
@@ -138,5 +141,9 @@ public class GameLayout {
     // Show a notice message
     public void showMessage(String message) {
         messageLabel.setText(message);
+    }
+
+    public void showUsername(String username) {
+    	usernameLabel.setText(username);
     }
 }
