@@ -28,7 +28,7 @@ public class Server {
 
 	private void loadUserRecords() {
 		try (FileReader reader = new FileReader(RECORDS_FILE)) {
-			ArrayList<UserRecord> records = gson.fromJson(reader, new TypeToken<ArrayList<UserRecord>>(){}.getType());  // Read json file to java arraylist
+			ArrayList<UserRecord> records = gson.fromJson(reader, new TypeToken<ArrayList<UserRecord>>(){}.getType());  // Read JSON file to java arraylist
 			if (records != null) {
 				for (UserRecord record : records) {
 					userRecords.put(record.getUsername(), record);  // Add each record to the map
