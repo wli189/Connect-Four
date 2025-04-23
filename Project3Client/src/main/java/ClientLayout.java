@@ -7,6 +7,8 @@ import javafx.application.Platform;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 
+import java.io.IOException;
+
 public class ClientLayout {
 
     @FXML
@@ -19,6 +21,9 @@ public class ClientLayout {
     private TextField usernameInput;
 
     @FXML
+    private Button leaderboardButton;
+
+    @FXML
     private void handleStartButtonClick() throws Exception {
         String username = usernameInput.getText().trim();
         Client clientThread = new Client();
@@ -26,7 +31,6 @@ public class ClientLayout {
         clientThread.start();
         GuiClient.setClient(clientThread);
 
-        System.out.println("Start Game clicked!");
         // Load the game layout
         FXMLLoader loader = new FXMLLoader(getClass().getResource("gameLayout.fxml"));
         Parent root = loader.load();
@@ -47,5 +51,18 @@ public class ClientLayout {
         System.out.println("Exiting.");
         Platform.exit();
         System.exit(0);  // Close the program
+    }
+
+    @FXML
+    private void handleLeaderboardButton() throws IOException {
+        FXMLLoader loader = new FXMLLoader(getClass().getResource("leaderboard.fxml"));
+        Parent root = loader.load();
+
+        // Get current window from the button
+        Stage currentStage = (Stage) leaderboardButton.getScene().getWindow();
+
+        // Set the new scene on the same stage
+        currentStage.setScene(new Scene(root));
+        currentStage.show();
     }
 }

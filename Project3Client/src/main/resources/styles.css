@@ -88,3 +88,43 @@
     -fx-font-size: 14px;
     -fx-padding: 10;
 }
+
+.leaderboard-title {
+    -fx-font-family: "Arial Bold";
+    -fx-font-size: 16px; /* Smaller than .label’s 27px */
+}
+
+.table-view.leaderboard-table {
+    -fx-background-color: #f4f4f4;
+    -fx-border-color: #dcdcdc;
+    -fx-border-width: 1;
+    -fx-border-radius: 5;
+    -fx-font-size: 12px;
+}
+
+.table-view.leaderboard-table .column-header {
+    -fx-background-color: #4CAF50;
+    -fx-text-fill: white;
+    -fx-font-size: 12px;
+    -fx-font-family: "Arial";
+    -fx-padding: 5;
+}
+
+.table-view.leaderboard-table .table-cell {
+    -fx-font-size: 12px;
+    -fx-font-family: "Arial";
+    -fx-padding: 5;
+    -fx-alignment: CENTER;
+}
+
+.table-view.leaderboard-table .table-row-cell:odd {
+    -fx-background-color: #e9e9e9;
+}
+
+.table-view.leaderboard-table .table-row-cell:even {
+    -fx-background-color: #f4f4f4;
+}
+
+.table-view.leaderboard-table .table-row-cell:hover {
+    -fx-background-color: #d0d0d0;
+}

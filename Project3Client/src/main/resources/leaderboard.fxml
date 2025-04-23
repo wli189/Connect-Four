@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<?import javafx.scene.control.*?>
+<?import javafx.scene.layout.*?>
+
+<AnchorPane prefHeight="400.0" prefWidth="600.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Leaderboard">
+    <VBox alignment="CENTER" spacing="10" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+        <Label fx:id="titleLabel" styleClass="leaderboard-title" text="Leaderboard" />
+        <TableView fx:id="leaderboardTable" prefHeight="283.0" prefWidth="580.0" styleClass="leaderboard-table">
+            <columns>
+                <TableColumn fx:id="usernameColumn" prefWidth="290.0" sortable="false" text="Username" />
+                <TableColumn fx:id="winsColumn" prefWidth="128.33331298828125" sortType="DESCENDING" text="Wins" />
+                <TableColumn fx:id="lossesColumn" prefWidth="159.33334350585938" sortable="false" text="Losses" />
+            </columns>
+        </TableView>
+        <Button fx:id="closeButton" onAction="#handleCloseButtonClick" styleClass="button-style" text="Close" />
+    </VBox>
+</AnchorPane>

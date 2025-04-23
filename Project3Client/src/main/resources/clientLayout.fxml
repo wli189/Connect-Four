@@ -28,6 +28,11 @@
                   </HBox>
                </children>
             </VBox>
+            <Button fx:id="leaderboardButton" mnemonicParsing="false" onAction="#handleLeaderboardButton" styleClass="button-style" text="Leaderboard">
+               <font>
+                  <Font name="Arial" size="12.0" />
+               </font>
+            </Button>
          </children>
       </VBox>
    </children>
