@@ -1,7 +1,4 @@
 import javafx.application.Platform;
-import javafx.beans.property.SimpleDoubleProperty;
-import javafx.beans.property.SimpleIntegerProperty;
-import javafx.beans.property.SimpleStringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -9,23 +6,20 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
-import javafx.scene.control.TableCell;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
-import java.io.File;
-import java.io.FileReader;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
+import java.sql.*;
+
 
 public class Leaderboard {
     @FXML
     private TableView<UserRecord> leaderboardTable;
+
+    @FXML
+    private TableColumn<UserRecord, Number> rankColumn;
 
     @FXML
     private TableColumn<UserRecord, String> usernameColumn;
@@ -39,52 +33,57 @@ public class Leaderboard {
     @FXML
     private Button closeButton;
 
-    private static final String RECORDS_FILE = "../user_records.json";
+    static final String DB_URL = "jdbc:sqlite:../user_records.db";
+    private static Connection dbConnection;
 
     @FXML
     private void initialize() {
-        // Configure TableView columns
-        usernameColumn.setCellValueFactory(cellData -> new SimpleStringProperty(cellData.getValue().getUsername()));
-        winsColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getWins()));
-        lossesColumn.setCellValueFactory(cellData -> new SimpleIntegerProperty(cellData.getValue().getLosses()));
+        // Configure TableColumn bindings
+        rankColumn.setCellValueFactory(cellData -> cellData.getValue().rank());
+        usernameColumn.setCellValueFactory(cellData -> cellData.getValue().username());
+        winsColumn.setCellValueFactory(cellData -> cellData.getValue().wins());
+        lossesColumn.setCellValueFactory(cellData -> cellData.getValue().losses());
 
-        // Table sorting by wins
-        winsColumn.setSortType(TableColumn.SortType.DESCENDING);
-
-        // Load user_records.json
         loadUserRecords();
     }
 
     private void loadUserRecords() {
-        try (FileReader reader = new FileReader(RECORDS_FILE)) {
-            // Initialize Gson
-            Gson gson = new GsonBuilder().create();
+        try {
+            ObservableList<UserRecord> userRecords = FXCollections.observableArrayList();
 
-            // Read JSON file to java arraylist
-            ArrayList<UserRecord> userRecords = gson.fromJson(reader, new TypeToken<ArrayList<UserRecord>>(){}.getType());
-            if (userRecords == null) {
-                userRecords = new ArrayList<>();
+            // Load SQLite JDBC driver
+            Class.forName("org.sqlite.JDBC");
+            // Connect to database
+            dbConnection = DriverManager.getConnection(DB_URL);
+            Statement stmt = dbConnection.createStatement();
+
+            // Query to fetch all user records
+            String query = """
+                            SELECT username, wins, losses FROM user_records ORDER BY wins DESC, losses ASC, username ASC
+                            """;
+            ResultSet rs = stmt.executeQuery(query);
+
+            // Add data to userRecords list
+            int rank = 1;
+            while (rs.next()) {
+                String username = rs.getString("username");
+                int wins = rs.getInt("wins");
+                int losses = rs.getInt("losses");
+                userRecords.add(new UserRecord(rank++, username, wins, losses));
             }
 
-            // Convert List to ObservableList for TableView
-            ObservableList<UserRecord> observableRecords = FXCollections.observableArrayList(userRecords);
-
             // Set the items in the TableView
-            leaderboardTable.setItems(observableRecords);
+            leaderboardTable.setItems(userRecords);
 
-            // Show sorted table
-            Platform.runLater(() -> {
-                leaderboardTable.getSortOrder().add(winsColumn);
-                leaderboardTable.sort();
-            });
-        } catch (IOException e) {
-            System.err.println("Error reading user_records.json: " + e.getMessage());
+        } catch (ClassNotFoundException e) {
+            System.err.println("SQLite JDBC driver not found: " + e.getMessage());
+        } catch (SQLException e) {
+            System.err.println("SQL Exception: " + e.getMessage());
         }
     }
 
     @FXML
     private void handleCloseButtonClick() throws Exception {
-
         FXMLLoader loader = new FXMLLoader(getClass().getResource("clientLayout.fxml"));
         Parent root = loader.load();
 

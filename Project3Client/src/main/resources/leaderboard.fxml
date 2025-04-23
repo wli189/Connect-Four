@@ -8,9 +8,10 @@
         <Label fx:id="titleLabel" styleClass="leaderboard-title" text="Leaderboard" />
         <TableView fx:id="leaderboardTable" prefHeight="283.0" prefWidth="580.0" styleClass="leaderboard-table">
             <columns>
-                <TableColumn fx:id="usernameColumn" prefWidth="290.0" sortable="false" text="Username" />
-                <TableColumn fx:id="winsColumn" prefWidth="128.33331298828125" sortType="DESCENDING" text="Wins" />
-                <TableColumn fx:id="lossesColumn" prefWidth="159.33334350585938" sortable="false" text="Losses" />
+                <TableColumn fx:id="rankColumn" prefWidth="114.0" sortable="false" text="Rank #" />
+                <TableColumn fx:id="usernameColumn" prefWidth="203.0" sortable="false" text="Username" />
+                <TableColumn fx:id="winsColumn" prefWidth="132.3333740234375" sortType="DESCENDING" text="Wins" />
+                <TableColumn fx:id="lossesColumn" prefWidth="128.33331298828125" sortable="false" text="Losses" />
             </columns>
         </TableView>
         <Button fx:id="closeButton" onAction="#handleCloseButtonClick" styleClass="button-style" text="Close" />

@@ -6,6 +6,7 @@ import com.google.gson.reflect.TypeToken;
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
+import java.sql.*;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
@@ -16,61 +17,76 @@ public class Server {
 	ArrayList<ClientThread> clients = new ArrayList<>();
 	ArrayList<GameThread> games = new ArrayList<>();
 	TheServer server;
-	static final String RECORDS_FILE = "../user_records.json";
-	private static Map<String, UserRecord> userRecords = new HashMap<>(); // Store records in memory
-	private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
+	static final String DB_URL = "jdbc:sqlite:../user_records.db";
+	private static Connection dbConnection;
 
 	Server() {
-		loadUserRecords();
+		initializeDatabase();
 		server = new TheServer();
 		server.start();
 	}
 
-	private void loadUserRecords() {
-		try (FileReader reader = new FileReader(RECORDS_FILE)) {
-			ArrayList<UserRecord> records = gson.fromJson(reader, new TypeToken<ArrayList<UserRecord>>(){}.getType());  // Read JSON file to java arraylist
-			if (records != null) {
-				for (UserRecord record : records) {
-					userRecords.put(record.getUsername(), record);  // Add each record to the map
-				}
-			}
-		} catch (FileNotFoundException e) {
-			System.out.println("No existing user records found. Creating new user_records.json.");
-			try (FileWriter writer = new FileWriter(RECORDS_FILE)) {
-				// Write an empty array to the file
-				gson.toJson(new ArrayList<UserRecord>(), writer);
-			} catch (IOException ex) {
-				System.err.println("Error creating user_records.json: " + ex.getMessage());
-			}
-		} catch (IOException e) {
-			System.err.println("Error loading user records: " + e.getMessage());
+	private void initializeDatabase() {
+		try {
+			// Load SQLite JDBC driver
+			Class.forName("org.sqlite.JDBC");
+			// Connect to database
+			dbConnection = DriverManager.getConnection(DB_URL);
+			Statement stmt = dbConnection.createStatement();
+			// Create user_records table if it doesn't exist
+			String createTableSQL = """
+                CREATE TABLE IF NOT EXISTS user_records (
+                    username TEXT PRIMARY KEY,
+                    password TEXT NOT NULL,
+                    wins INTEGER NOT NULL DEFAULT 0,
+                    losses INTEGER NOT NULL DEFAULT 0
+                )
+                """;
+
+			stmt.executeUpdate(createTableSQL);
+		} catch (ClassNotFoundException e) {
+			System.err.println("SQLite JDBC driver not found: " + e.getMessage());
+		} catch (SQLException e) {
+			System.err.println("Error initializing database: " + e.getMessage());
+		}
+    }
+
+
+	private static void createNewUserRecord(String username) {
+		try {
+			String createUserSQL = """
+					INSERT INTO user_records (username, password, wins, losses) VALUES (?, ?, ?, ?)
+					""";
+			PreparedStatement pstmt = dbConnection.prepareStatement(createUserSQL);
+			pstmt.setString(1, username);
+			pstmt.setString(2, "");
+			pstmt.setInt(3, 0);
+			pstmt.setInt(4, 0);
+			pstmt.executeUpdate();
+
+
+		} catch (SQLException e) {
+			System.err.println("Error creating new user record: " + e.getMessage());
 		}
 	}
 
-	// Save user records to JSON file
-	private static void saveUserRecords() {
-		try (FileWriter writer = new FileWriter(RECORDS_FILE)) {
-			ArrayList<UserRecord> records = new ArrayList<>(userRecords.values());
-			gson.toJson(records, writer);
-		} catch (IOException e) {
-			System.err.println("Error saving user records: " + e.getMessage());
-		}
-	}
-
-	// create a user record if it doesn't exist or get the existing one if it does exist
-	private static UserRecord createNewUserRecord(String username) {
-		return userRecords.computeIfAbsent(username, k -> new UserRecord(username, "", 0, 0));
-	}
-
-	// Update win/loss record
-	public static void updateUserRecord(String username, boolean isWin) {
-		UserRecord record = createNewUserRecord(username);
+	public static void updateUserRecord(String username, boolean isWin) throws SQLException {
+		// Ensure user exists
+		createNewUserRecord(username);
+		String updateSQL = "";
+		// Update wins or losses
 		if (isWin) {
-			record.incrementWins();
-		} else {
-			record.incrementLosses();
+			updateSQL = """
+						UPDATE user_records SET wins = wins + 1 WHERE username = ?
+						""";
+		} else if (!isWin) {
+			updateSQL = """
+						UPDATE user_records SET losses = losses + 1 WHERE username = ?
+						""";
 		}
-		saveUserRecords(); // Save after every update
+		PreparedStatement pstmt = dbConnection.prepareStatement(updateSQL);
+		pstmt.setString(1, username);
+		pstmt.executeUpdate();
 	}
 
 	public class TheServer extends Thread{
@@ -158,7 +174,6 @@ public class Server {
 				sendToSelf("PLAYER: " + playerID + " - " + getDisplayName()); // Send player ID to client
 
 				createNewUserRecord(getDisplayName());
-				saveUserRecords();
 			} catch (Exception e) {
 				System.err.println("Error initializing client #" + count + ": " + e.getMessage());
 			}

@@ -1,41 +1,32 @@
+import javafx.beans.property.SimpleIntegerProperty;
+import javafx.beans.property.SimpleStringProperty;
+
 public class UserRecord {
-    private String username;
-    private int wins;
-    private int losses;
-    private String password;
+    private final SimpleIntegerProperty rank;
+    private final SimpleStringProperty username;
+    private final SimpleIntegerProperty wins;
+    private final SimpleIntegerProperty losses;
 
-    public UserRecord(String username, String password, int wins, int losses) {
-        this.username = username;
-        this.password = password;
-        this.wins = wins;
-        this.losses = losses;
+    public UserRecord(int rank, String username, int wins, int losses) {
+        this.rank = new SimpleIntegerProperty(rank);
+        this.username = new SimpleStringProperty(username);
+        this.wins = new SimpleIntegerProperty(wins);
+        this.losses = new SimpleIntegerProperty(losses);
     }
 
-    public String getPassword() {
-        return password;
+    public SimpleIntegerProperty rank() {
+        return rank;
     }
 
-    public String getUsername() {
+    public SimpleStringProperty username() {
         return username;
     }
 
-    public int getWins() {
+    public SimpleIntegerProperty wins() {
         return wins;
     }
 
-    public int getLosses() {
+    public SimpleIntegerProperty losses() {
         return losses;
-    }
-
-    public void setPassword(String password) {
-        this.password = password;
-    }
-
-    public void incrementWins() {
-        this.wins++;
-    }
-
-    public void incrementLosses() {
-        this.losses++;
     }
 }

@@ -1,6 +1,8 @@
 import Game.GameMechanics;
 import Message.GameState;
 
+import java.sql.SQLException;
+
 public class GameThread {
     public Object gameLock = new Object();
     public GameMechanics game = new GameMechanics();
@@ -33,7 +35,7 @@ public class GameThread {
     }
 
     // Send game state to both players
-    public void sendGameState() {
+    public void sendGameState() throws SQLException {
         boolean win = game.checkWin();
         boolean draw = game.isDraw();
         int[][] board = game.getBoard();
