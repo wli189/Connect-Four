@@ -15,6 +15,7 @@ public class Server {
 	int count = 1;
 	ArrayList<ClientThread> clients = new ArrayList<>();
 	ArrayList<GameThread> games = new ArrayList<>();
+	ArrayList<String> usernames = new ArrayList<>();
 	TheServer server;
 	static final String RECORDS_FILE = "../user_records.json";
 	private static Map<String, UserRecord> userRecords = new HashMap<>(); // Store records in memory
@@ -149,7 +150,18 @@ public class Server {
 
 				Object data = in.readObject();
 				if (data instanceof String message && message.startsWith("USERNAME:")) {
-					username = message.substring(9);
+					String requestedUsername = message.substring(9);
+					// checks if username is taken
+					synchronized (usernames) {
+						if (usernames.contains(requestedUsername)) {
+							sendToSelf("ERROR: Username already taken. Please choose another.");
+							connection.close();
+							return;
+						} else {
+							usernames.add(requestedUsername);
+							this.username = requestedUsername;
+						}
+					}
 //					System.out.println("Client #" + count + " set username to: " + username);
 				}
 				if (playerID == 2) {
@@ -250,6 +262,12 @@ public class Server {
 							}
 							games.remove(gameThread);
 							System.out.println("Removed game because client #" + count + " (Game " + gameThread.getGameId() + " Player "+ playerID + ") disconnected");
+						}
+					}
+					// removes names from the usernames list to allow for other to use the name
+					synchronized (usernames) {
+						if (username != null) {
+							usernames.remove(username);
 						}
 					}
 					break;

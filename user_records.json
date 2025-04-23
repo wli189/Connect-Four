@@ -6,6 +6,12 @@
     "password": ""
   },
   {
+    "username": "joe",
+    "wins": 0,
+    "losses": 1,
+    "password": ""
+  },
+  {
     "username": "Client #11",
     "wins": 50,
     "losses": 0,
@@ -18,8 +24,38 @@
     "password": ""
   },
   {
+    "username": "h",
+    "wins": 0,
+    "losses": 0,
+    "password": ""
+  },
+  {
+    "username": "John",
+    "wins": 0,
+    "losses": 1,
+    "password": ""
+  },
+  {
+    "username": "l",
+    "wins": 0,
+    "losses": 0,
+    "password": ""
+  },
+  {
     "username": "Client #1",
     "wins": 45,
+    "losses": 0,
+    "password": ""
+  },
+  {
+    "username": "lous",
+    "wins": 1,
+    "losses": 0,
+    "password": ""
+  },
+  {
+    "username": "alex",
+    "wins": 1,
     "losses": 0,
     "password": ""
   },
@@ -27,6 +63,12 @@
     "username": "Client #5",
     "wins": 0,
     "losses": 0,
+    "password": ""
+  },
+  {
+    "username": "Helmer",
+    "wins": 1,
+    "losses": 1,
     "password": ""
   },
   {
@@ -55,6 +97,12 @@
   },
   {
     "username": "Client #8",
+    "wins": 0,
+    "losses": 0,
+    "password": ""
+  },
+  {
+    "username": "john",
     "wins": 0,
     "losses": 0,
     "password": ""
