@@ -15,7 +15,9 @@ public class Client extends Thread {
 	private String username;
 	private String player1Username;
 	private String player2Username;
+	private String opponentPlayerUsername;
 	private int playerID;
+	private int opponentPlayerID;
 
 	public Client() {
 		this.username = "";
@@ -84,28 +86,33 @@ public class Client extends Thread {
 				// Print out message from server
 				else if (obj instanceof String message) {
 					System.out.println(message);
-					if (message.startsWith("ERROR:") || message.startsWith("PLAYER_ID:") || message.startsWith("SERVER:") || message.startsWith("OPPONENT_PLAYER_USERNAME:")) {
+					if (message.startsWith("ERROR:") || message.startsWith("PLAYER:") || message.startsWith("SERVER:") || message.startsWith("OPPONENT_PLAYER:")) {
 						Platform.runLater(() -> {
 							try {
 								GameLayout controller = GuiClient.getGameController();
 								if (message.startsWith("ERROR:")) {
 									controller.showMessage(message.substring(7));
-								} else if (message.startsWith("PLAYER_ID:")) {
+								} else if (message.startsWith("PLAYER:")) {
 									// Parse out the player ID and username from server
 									String[] parts = message.split(" - ", 2);
-									String id = parts[0].substring(11);
+									String id = parts[0].substring(8);
 									playerID = Integer.parseInt(id.trim());
 									if (playerID == 1) {
 										player1Username = parts[1];
+										controller.showMessage("You are Player " + playerID + " - " + this.getUsername() + "\n" + player1Username + " goes first");
 									} else if (playerID == 2) {
 										player2Username = parts[1];
+										controller.showMessage("You are Player " + playerID + " - " + this.getUsername() + "\n" + opponentPlayerUsername + " goes first");
 									}
-                                    controller.showMessage("You are Player " + playerID + " - " + this.getUsername() + "\n" + player1Username + " goes first");
 									controller.showUsername(this.getUsername());
                                 } else if (message.startsWith("SERVER:")) {
 									controller.showMessage(message.substring(8));
-								} else if (message.startsWith("OPPONENT_PLAYER_USERNAME:")) {
-									player1Username = message.substring(26);
+								} else if (message.startsWith("OPPONENT_PLAYER:")) {
+									String[] parts = message.split(" - ", 2);
+									String id = parts[0].substring(17);
+									opponentPlayerID = Integer.parseInt(id.trim());
+									opponentPlayerUsername = parts[1];
+									System.out.println("Opponent Player ID: " + opponentPlayerID + " - " + opponentPlayerUsername);
 								}
 							} catch (Exception e) {
 								e.printStackTrace();

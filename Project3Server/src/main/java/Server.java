@@ -102,7 +102,7 @@ public class Server {
 							System.out.println("Paired client #" + count + " as Player 2");
 							if (joinableGame.player1 != null) {
 								joinableGame.player1.sendToSelf("SERVER: Player 2 has joined: " + c.getDisplayName()); // Tell player 1 that player 2 joined
-								joinableGame.player1.sendToSelf("OPPONENT_PLAYER_USERNAME: "+ c.getDisplayName());  // Tell player 1 the player 2's username
+								joinableGame.player1.sendToSelf("OPPONENT_PLAYER: 1 - "+ c.getDisplayName());  // Tell player 1 the player 2's username
 							}
 						}
 						// Create new game
@@ -153,9 +153,9 @@ public class Server {
 //					System.out.println("Client #" + count + " set username to: " + username);
 				}
 				if (playerID == 2) {
-					sendToSelf("OPPONENT_PLAYER_USERNAME: "+ gameThread.player1.getDisplayName()); // Tell player 2 the player 1's username
+					sendToSelf("OPPONENT_PLAYER: 2 - "+ gameThread.player1.getDisplayName()); // Tell player 2 the player 1's username
 				}
-				sendToSelf("PLAYER_ID: " + playerID + " - " + getDisplayName()); // Send player ID to client
+				sendToSelf("PLAYER: " + playerID + " - " + getDisplayName()); // Send player ID to client
 
 				createNewUserRecord(getDisplayName());
 				saveUserRecords();
