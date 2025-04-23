@@ -47,6 +47,14 @@ public class GameThread {
             status = "ONGOING";
         }
 
+        Server.ClientThread winner = (game.getCurrentPlayer() == 1) ? player1 : player2;
+        Server.ClientThread loser = (game.getCurrentPlayer() == 1) ? player2 : player1;
+
+        if (win) {
+            Server.updateUserRecord(winner.getDisplayName(), true); // Win for current player
+            Server.updateUserRecord(loser.getDisplayName(), false); // Loss for opponent
+        }
+
         GameState gameState = new GameState(board, game.getCurrentPlayer(), status);
         try {
             if (player1 != null && !player1.connection.isClosed()) {

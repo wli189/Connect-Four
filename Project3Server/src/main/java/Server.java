@@ -1,11 +1,14 @@
 import Message.*;
+import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
+import com.google.gson.reflect.TypeToken;
 
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
+import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 public class Server {
@@ -13,11 +16,61 @@ public class Server {
 	ArrayList<ClientThread> clients = new ArrayList<>();
 	ArrayList<GameThread> games = new ArrayList<>();
 	TheServer server;
-
+	static final String RECORDS_FILE = "../user_records.json";
+	private static Map<String, UserRecord> userRecords = new HashMap<>(); // Store records in memory
+	private static Gson gson = new GsonBuilder().setPrettyPrinting().create();
 
 	Server() {
+		loadUserRecords();
 		server = new TheServer();
 		server.start();
+	}
+
+	private void loadUserRecords() {
+		try (FileReader reader = new FileReader(RECORDS_FILE)) {
+			ArrayList<UserRecord> records = gson.fromJson(reader, new TypeToken<ArrayList<UserRecord>>(){}.getType());  // Read json file to java arraylist
+			if (records != null) {
+				for (UserRecord record : records) {
+					userRecords.put(record.getUsername(), record);  // Add each record to the map
+				}
+			}
+		} catch (FileNotFoundException e) {
+			System.out.println("No existing user records found. Creating new user_records.json.");
+			try (FileWriter writer = new FileWriter(RECORDS_FILE)) {
+				// Write an empty array to the file
+				gson.toJson(new ArrayList<UserRecord>(), writer);
+			} catch (IOException ex) {
+				System.err.println("Error creating user_records.json: " + ex.getMessage());
+			}
+		} catch (IOException e) {
+			System.err.println("Error loading user records: " + e.getMessage());
+		}
+	}
+
+	// Save user records to JSON file
+	private static void saveUserRecords() {
+		try (FileWriter writer = new FileWriter(RECORDS_FILE)) {
+			ArrayList<UserRecord> records = new ArrayList<>(userRecords.values());
+			gson.toJson(records, writer);
+		} catch (IOException e) {
+			System.err.println("Error saving user records: " + e.getMessage());
+		}
+	}
+
+	// create a user record if it doesn't exist or get the existing one if it does exist
+	private static UserRecord createNewUserRecord(String username) {
+		return userRecords.computeIfAbsent(username, k -> new UserRecord(username, "", 0, 0));
+	}
+
+	// Update win/loss record
+	public static void updateUserRecord(String username, boolean isWin) {
+		UserRecord record = createNewUserRecord(username);
+		if (isWin) {
+			record.incrementWins();
+		} else {
+			record.incrementLosses();
+		}
+		saveUserRecords(); // Save after every update
 	}
 
 	public class TheServer extends Thread{
@@ -103,6 +156,9 @@ public class Server {
 					sendToSelf("OPPONENT_PLAYER_USERNAME: "+ gameThread.player1.getDisplayName()); // Tell player 2 the player 1's username
 				}
 				sendToSelf("PLAYER_ID: " + playerID + " - " + getDisplayName()); // Send player ID to client
+
+				createNewUserRecord(getDisplayName());
+				saveUserRecords();
 			} catch (Exception e) {
 				System.err.println("Error initializing client #" + count + ": " + e.getMessage());
 			}
@@ -115,7 +171,7 @@ public class Server {
 		}
 
 		// Get username for this client
-		private String getDisplayName() {
+        public String getDisplayName() {
 			if (username != null && !username.equals("")) {
 				return username;
 			}

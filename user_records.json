@@ -1,0 +1,14 @@
+[
+  {
+    "username": "Client #1",
+    "wins": 0,
+    "losses": 0,
+    "password": ""
+  },
+  {
+    "username": "Client #2",
+    "wins": 0,
+    "losses": 0,
+    "password": ""
+  }
+]
