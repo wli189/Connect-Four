@@ -1,16 +1,10 @@
 import Message.*;
-import com.google.gson.Gson;
-import com.google.gson.GsonBuilder;
-import com.google.gson.reflect.TypeToken;
 
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
 import java.sql.*;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
 
 public class Server {
 	int count = 1;
@@ -100,6 +94,13 @@ public class Server {
 				while(true) {
 					ClientThread c = new ClientThread(mysocket.accept(), count);
 					// Protect the games list and make sure there is no concurrent modification
+
+					// Initialize client to validate username before pairing
+					if (!c.preInitialize()) {
+						// Username validation failed; client connection is already closed
+						count++;
+						continue;
+					}
 					synchronized (games) {
 						// Pair clients
 						GameThread joinableGame = null;
@@ -115,7 +116,7 @@ public class Server {
 						if (joinableGame != null) {
 							joinableGame.setPlayer2(c);
 							c.setGame(joinableGame, 2);
-							c.initialize();
+							c.postInitialize();
 							System.out.println("Paired client #" + count + " as Player 2");
 							if (joinableGame.player1 != null) {
 								joinableGame.player1.sendToSelf("SERVER: Player 2 has joined: " + c.getDisplayName()); // Tell player 1 that player 2 joined
@@ -127,7 +128,7 @@ public class Server {
 							GameThread newGame = new GameThread(c);
 							games.add(newGame);
 							c.setGame(newGame, 1);
-							c.initialize();
+							c.postInitialize();
 							System.out.println("No one waiting, created new game for client #" + count + " as Player 1");
 						}
 					}
@@ -157,7 +158,7 @@ public class Server {
 		}
 
 		// Initialize client by reading username from client and send it to client
-		void initialize() {
+		boolean preInitialize() {
 			try {
 				out = new ObjectOutputStream(connection.getOutputStream());
 				out.flush();
@@ -170,25 +171,30 @@ public class Server {
 					// checks if username is taken
 					synchronized (usernames) {
 						if (usernames.contains(requestedUsername)) {
-							sendToSelf("ERROR: Username already taken. Please choose another.");
+							sendToSelf("USERNAME_ERROR: User already login in. Please try again later or choose another username.");
 							connection.close();
-							return;
+							return false;
 						} else {
 							usernames.add(requestedUsername);
 							this.username = requestedUsername;
 						}
 					}
+					return true;
 //					System.out.println("Client #" + count + " set username to: " + username);
 				}
-				if (playerID == 2) {
-					sendToSelf("OPPONENT_PLAYER: 2 - "+ gameThread.player1.getDisplayName()); // Tell player 2 the player 1's username
-				}
-				sendToSelf("PLAYER: " + playerID + " - " + getDisplayName()); // Send player ID to client
-
-				createNewUserRecord(getDisplayName());
 			} catch (Exception e) {
 				System.err.println("Error initializing client #" + count + ": " + e.getMessage());
 			}
+			return false;
+		}
+
+		void postInitialize() {
+			if (playerID == 2) {
+				sendToSelf("OPPONENT_PLAYER: 2 - "+ gameThread.player1.getDisplayName()); // Tell player 2 the player 1's username
+			}
+			sendToSelf("PLAYER: " + playerID + " - " + getDisplayName()); // Send player ID to client
+
+			createNewUserRecord(getDisplayName());
 		}
 
 		// Set game for this client and assign player ID

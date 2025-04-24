@@ -1,3 +1,4 @@
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
@@ -9,6 +10,7 @@ import javafx.scene.control.Button;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
 import java.sql.*;
@@ -90,11 +92,17 @@ public class Leaderboard {
         // Create a new scene with the previous scene layout
         Scene previousScene = new Scene(root);
 
+        root.setOpacity(0); // Start fully transparent
+        FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), root); // 500ms duration
+        fadeTransition.setFromValue(0.0); // Start opacity
+        fadeTransition.setToValue(1.0);   // End opacity
+
         // Get current window from the button
         Stage currentStage = (Stage) closeButton.getScene().getWindow();
 
         // Set the new scene on the same stage
         currentStage.setScene(previousScene);
+        fadeTransition.play();
         currentStage.show();
     }
 }

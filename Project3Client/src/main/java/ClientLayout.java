@@ -1,3 +1,4 @@
+import javafx.animation.FadeTransition;
 import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -6,6 +7,7 @@ import javafx.scene.control.Button;
 import javafx.application.Platform;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 import java.io.IOException;
 
@@ -38,11 +40,20 @@ public class ClientLayout {
         GameLayout controller = loader.getController();
         GuiClient.setGameController(controller);
 
+        // Create the new scene
+        Scene gameScene = new Scene(root);
+
+        root.setOpacity(0); // Start fully transparent
+        FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), root); // 500ms duration
+        fadeTransition.setFromValue(0.0); // Start opacity
+        fadeTransition.setToValue(1.0);   // End opacity
+
         // Get current window from the button
         Stage currentStage = (Stage) startButton.getScene().getWindow();
 
         // Set the new scene on the same stage
-        currentStage.setScene(new Scene(root));
+        currentStage.setScene(gameScene);
+        fadeTransition.play();
         currentStage.show();
     }
 
@@ -58,11 +69,20 @@ public class ClientLayout {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("leaderboard.fxml"));
         Parent root = loader.load();
 
+        // Create a new scene
+        Scene leaderboardScene = new Scene(root);
+
+        root.setOpacity(0); // Start fully transparent
+        FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), root); // 500ms duration
+        fadeTransition.setFromValue(0.0); // Start opacity
+        fadeTransition.setToValue(1.0);   // End opacity
+
         // Get current window from the button
         Stage currentStage = (Stage) leaderboardButton.getScene().getWindow();
 
         // Set the new scene on the same stage
-        currentStage.setScene(new Scene(root));
+        currentStage.setScene(leaderboardScene);
+        fadeTransition.play();
         currentStage.show();
     }
 }

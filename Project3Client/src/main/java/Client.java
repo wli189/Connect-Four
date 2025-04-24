@@ -86,7 +86,7 @@ public class Client extends Thread {
 				// Print out message from server
 				else if (obj instanceof String message) {
 					System.out.println(message);
-					if (message.startsWith("ERROR:") || message.startsWith("PLAYER:") || message.startsWith("SERVER:") || message.startsWith("OPPONENT_PLAYER:")) {
+					if (message.startsWith("ERROR:") || message.startsWith("PLAYER:") || message.startsWith("SERVER:") || message.startsWith("OPPONENT_PLAYER:") || message.startsWith("USERNAME_ERROR:")) {
 						Platform.runLater(() -> {
 							try {
 								GameLayout controller = GuiClient.getGameController();
@@ -99,7 +99,7 @@ public class Client extends Thread {
 									playerID = Integer.parseInt(id.trim());
 									if (playerID == 1) {
 										player1Username = parts[1];
-										controller.showMessage("You are Player " + playerID + " - " + this.getUsername() + "\n" + player1Username + " goes first");
+										controller.showMessage("You are Player " + playerID + " - " + this.getUsername() + "\n" + player1Username + " goes first. Wait for your opponent to join.");
 									} else if (playerID == 2) {
 										player2Username = parts[1];
 										controller.showMessage("You are Player " + playerID + " - " + this.getUsername() + "\n" + opponentPlayerUsername + " goes first");
@@ -113,6 +113,8 @@ public class Client extends Thread {
 									opponentPlayerID = Integer.parseInt(id.trim());
 									opponentPlayerUsername = parts[1];
 									System.out.println("Opponent Player ID: " + opponentPlayerID + " - " + opponentPlayerUsername);
+								} else if (message.startsWith("USERNAME_ERROR:")) {
+									controller.showDuplicateUsernameMessage(message.substring(16));
 								}
 							} catch (Exception e) {
 								e.printStackTrace();

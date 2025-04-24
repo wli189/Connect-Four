@@ -1,3 +1,4 @@
+import javafx.animation.FadeTransition;
 import javafx.application.Platform;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
@@ -12,6 +13,7 @@ import javafx.fxml.FXML;
 import javafx.scene.paint.Color;
 import javafx.scene.shape.Circle;
 import javafx.stage.Stage;
+import javafx.util.Duration;
 
 public class GameLayout {
     @FXML
@@ -105,11 +107,17 @@ public class GameLayout {
         // Create a new scene with the previous scene layout
         Scene previousScene = new Scene(root);
 
+        root.setOpacity(0); // Start fully transparent
+        FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), root); // 500ms duration
+        fadeTransition.setFromValue(0.0); // Start opacity
+        fadeTransition.setToValue(1.0);   // End opacity
+
         // Get current window from the button
         Stage currentStage = (Stage) backButton.getScene().getWindow();
 
         // Set the new scene on the same stage
         currentStage.setScene(previousScene);
+        fadeTransition.play();
         currentStage.show();
     }
     // outputs the message on the message board
@@ -135,6 +143,37 @@ public class GameLayout {
             alert.setHeaderText(null);
             alert.setContentText(message);
             alert.showAndWait();
+
+            // Navigate back to ClientLayout after the alert
+            try {
+                Client clientThread = GuiClient.getClient();
+                if (clientThread != null) {
+                    clientThread.disconnect(); // Disconnect the client
+                    GuiClient.setClient(null); // Clear the client reference
+                }
+
+                // Load the ClientLayout
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("clientLayout.fxml"));
+                Parent root = loader.load();
+
+                // Create the new scene
+                Scene clientScene = new Scene(root);
+
+                root.setOpacity(0); // Start fully transparent
+                FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), root); // 500ms duration
+                fadeTransition.setFromValue(0.0); // Start opacity
+                fadeTransition.setToValue(1.0);   // End opacity
+
+                // Get the current stage
+                Stage currentStage = (Stage) messageLabel.getScene().getWindow();
+
+                // Set the new scene
+                currentStage.setScene(clientScene);
+                fadeTransition.play();
+                currentStage.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
         });
     }
 
@@ -145,5 +184,47 @@ public class GameLayout {
 
     public void showUsername(String username) {
     	usernameLabel.setText(username);
+    }
+
+    // Show a duplicate username message
+    public void showDuplicateUsernameMessage(String message) {
+        Platform.runLater(() -> {
+            Alert alert = new Alert(Alert.AlertType.ERROR);
+            alert.setTitle("Duplicate Username");
+            alert.setHeaderText(null);
+            alert.setContentText(message);
+            alert.showAndWait();
+
+            // Navigate back to ClientLayout after the alert
+            try {
+                Client clientThread = GuiClient.getClient();
+                if (clientThread != null) {
+                    clientThread.disconnect(); // Disconnect the client
+                    GuiClient.setClient(null); // Clear the client reference
+                }
+
+                // Load the ClientLayout
+                FXMLLoader loader = new FXMLLoader(getClass().getResource("clientLayout.fxml"));
+                Parent root = loader.load();
+
+                // Create the new scene
+                Scene clientScene = new Scene(root);
+
+                root.setOpacity(0); // Start fully transparent
+                FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), root); // 500ms duration
+                fadeTransition.setFromValue(0.0); // Start opacity
+                fadeTransition.setToValue(1.0);   // End opacity
+
+                // Get the current stage
+                Stage currentStage = (Stage) messageLabel.getScene().getWindow();
+
+                // Set the new scene
+                currentStage.setScene(clientScene);
+                fadeTransition.play();
+                currentStage.show();
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        });
     }
 }
