@@ -18,7 +18,8 @@ import javafx.util.Duration;
 public class GameLayout {
     @FXML
     private GridPane boardGrid;
-
+    @FXML
+    private Button rematchButton;
     @FXML
     private Label messageLabel;
 
@@ -44,6 +45,7 @@ public class GameLayout {
     public void initialize() {
         drawEmptyBoard(); // Draw an empty board before the first move
         sendButton.setOnAction(e -> sendMessage());
+        rematchButton.setVisible(false);
     }
 
     public void drawEmptyBoard() {
@@ -92,7 +94,19 @@ public class GameLayout {
 //        System.out.println("Clicked column: " + col);
         GuiClient.getClient().sendMove(col);
     }
-
+    // will send a message to the server for a rematch
+    @FXML
+    private void handleRematchButtonClick() {
+        Client client = GuiClient.getClient();
+        if (client != null) {
+            client.resetGame();  // Clear local game state
+            client.sendRematchRequest();  // Ask server to re-pair players
+            drawEmptyBoard();  // Reset board visuals
+            showMessage("Rematch request sent. Waiting for opponent...");
+            // will disable the rematch button as it is waiting
+            rematchButton.setVisible(false);
+        }
+    }
     @FXML
     private void handleBackButtonClick() throws Exception {
         Client client = GuiClient.getClient();
@@ -138,6 +152,11 @@ public class GameLayout {
     // Show a message when the game ends
     public void showEndMessage(String message) {
         Platform.runLater(() -> {
+            messageLabel.setText(message);
+            rematchButton.setVisible(true);
+        });
+        /*
+        Platform.runLater(() -> {
             Alert alert = new Alert(Alert.AlertType.INFORMATION);
             alert.setTitle("Game Over");
             alert.setHeaderText(null);
@@ -175,6 +194,8 @@ public class GameLayout {
                 e.printStackTrace();
             }
         });
+
+         */
     }
 
     // Show a notice message

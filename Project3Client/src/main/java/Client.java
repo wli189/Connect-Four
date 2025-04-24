@@ -179,7 +179,17 @@ public class Client extends Thread {
 			e.printStackTrace();
 		}
 	}
-
+	// Rematch will be sent to server
+	public void sendRematchRequest() {
+		try {
+			Message rematchMessage = new Message("REMATCH", "Requesting rematch");
+			out.writeObject(rematchMessage);
+			out.flush();
+			System.out.println("Sent rematch request to server");
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
 	// Reset game state for a new game
 	public void resetGame() {
 		gameEnded = false;

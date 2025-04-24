@@ -62,6 +62,10 @@
          <font>
             <Font name="System Bold" size="14.0" />
          </font></Label>
-      <Button fx:id="backButton" layoutX="460.0" layoutY="621.0" mnemonicParsing="false" onAction="#handleBackButtonClick" styleClass="button-style" text="Back" />
+        <VBox layoutX="460.0" layoutY="581.0" alignment="CENTER" spacing="15">
+            <Button fx:id="rematchButton" text="Rematch" styleClass="button-style" onAction="#handleRematchButtonClick" visible="false" />
+            <Button fx:id="backButton"  mnemonicParsing="false" onAction="#handleBackButtonClick" styleClass="button-style" text="Back" />
+
+        </VBox>
     </children>
 </AnchorPane>

@@ -150,13 +150,44 @@ public class Server {
 		GameThread gameThread;
 		int playerID;
 		String username;
+		boolean wantsRematch = false;
 
 		ClientThread(Socket s, int count){
 			this.connection = s;
 			this.count = count;
 			this.username = null;
 		}
+		private void handleRematchRequest() {
+			wantsRematch = true;
+			ClientThread opponent = (playerID == 1) ? gameThread.player2 : gameThread.player1;
 
+			if (opponent != null && opponent.wantsRematch) {
+				// Both players want a rematch, create a new game
+				System.out.println("Both players want rematch. Starting a new game.");
+
+				GameThread newGame = new GameThread(this, opponent);
+				synchronized (games) {
+					games.add(newGame);
+				}
+
+				// Reset flags
+				wantsRematch = false;
+				opponent.wantsRematch = false;
+
+				// Set new game
+				this.setGame(newGame, 1);
+				opponent.setGame(newGame, 2);
+
+				this.postInitialize();
+				opponent.postInitialize();
+
+				this.sendToSelf("SERVER: Starting rematch as Player 1");
+				opponent.sendToSelf("SERVER: Starting rematch as Player 2");
+			} else {
+				// Waiting for opponent's rematch decision
+				sendToSelf("SERVER: Waiting for opponent to accept rematch...");
+			}
+		}
 		// Initialize client by reading username from client and send it to client
 		boolean preInitialize() {
 			try {
@@ -166,6 +197,7 @@ public class Server {
 				connection.setTcpNoDelay(true);
 
 				Object data = in.readObject();
+
 				if (data instanceof String message && message.startsWith("USERNAME:")) {
 					String requestedUsername = message.substring(9);
 					// checks if username is taken
@@ -267,6 +299,10 @@ public class Server {
 						if ("CHAT".equals(message.getType())) {
 							sendChatToOpponent(message);
 //							System.out.println(message.toString());
+						}
+						// if rematch is requested it will make new game
+						if ("REMATCH".equals(message.getType())) {
+							handleRematchRequest();
 						}
 					}
 				} catch (Exception e) {
