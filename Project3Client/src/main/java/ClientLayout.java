@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.application.Platform;
+import javafx.scene.control.Label;
 import javafx.scene.control.TextField;
 import javafx.stage.Stage;
 import javafx.util.Duration;
@@ -27,25 +28,45 @@ public class ClientLayout {
     private Button leaderboardButton;
 
     @FXML
+    private Label loginMessage;
+
+    @FXML
+    private TextField passwordInput;
+
+    @FXML
     private void handleStartButtonClick() throws Exception {
         String username = usernameInput.getText().trim();
+        String password = passwordInput.getText().trim();
         if (username.isEmpty()) {
             // Show error message to the user
-            showError("Username cannot be empty!");
-            return; // Stop execution
+            showLoginMessage("Username cannot be empty!", false);
+            return;
+        }
+        if (password.isEmpty()) {
+            showLoginMessage("Password cannot be empty!", false);
+            return;
         }
 
-        Client clientThread = new Client();
+        Client clientThread = new Client(this);
         clientThread.setUsername(username);
+        clientThread.setPassword(password);
         clientThread.start();
         GuiClient.setClient(clientThread);
 
+//        // Show connecting message
+//        showLoginMessage("Connecting to server...", true);
+    }
+
+    private void switchToGameLayout() throws Exception {
         // Load the game layout
-        FXMLLoader loader = new FXMLLoader(getClass().getResource("gameLayout.fxml"));
+        FXMLLoader loader = new FXMLLoader(ClientLayout.class.getResource("gameLayout.fxml"));
         Parent root = loader.load();
 
-        GameLayout controller = loader.getController();
-        GuiClient.setGameController(controller);
+        GameLayout gameController = loader.getController();
+        Client client = GuiClient.getClient();
+        if (client != null) {
+            client.setGameController(gameController);
+        }
 
         // Create the new scene
         Scene gameScene = new Scene(root);
@@ -93,11 +114,32 @@ public class ClientLayout {
         currentStage.show();
     }
 
-    private void showError(String message) {
-        Alert alert = new Alert(Alert.AlertType.ERROR);
-        alert.setTitle("Error");
-        alert.setHeaderText(null);
-        alert.setContentText(message);
-        alert.showAndWait();
+    public void showLoginMessage(String message, boolean isSuccess) {
+        loginMessage.setText(message);
+        loginMessage.setStyle("-fx-background-color: " + (isSuccess ? "rgba(0, 128, 0, 0.7)" : "rgba(255, 0, 0, 0.7)") + "; -fx-text-fill: white;");
+
+        // Fade in
+        FadeTransition fadeIn = new FadeTransition(Duration.millis(500), loginMessage);
+        fadeIn.setFromValue(0.0);
+        fadeIn.setToValue(1.0);
+        loginMessage.setVisible(true);
+        fadeIn.play();
+
+        // Fade out after 2 seconds
+        FadeTransition fadeOut = new FadeTransition(Duration.millis(500), loginMessage);
+        fadeOut.setFromValue(1.0);
+        fadeOut.setToValue(0.0);
+        fadeOut.setDelay(Duration.seconds(2));
+        fadeOut.setOnFinished(event -> {
+            loginMessage.setVisible(false);
+            if (isSuccess) {
+                try {
+                    switchToGameLayout();
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
+            }
+        });
+        fadeOut.play();
     }
 }

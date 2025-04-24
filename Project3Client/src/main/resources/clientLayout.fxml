@@ -13,11 +13,16 @@
                   <Font name="Arial Bold" size="27.0" />
                </font>
             </Label>
-            <VBox prefHeight="133.0" prefWidth="600.0">
+            <VBox prefHeight="133.0" prefWidth="600.0" spacing="10.0">
                <children>
-                  <HBox alignment="CENTER" prefHeight="67.0" prefWidth="595.0">
+                  <HBox alignment="CENTER" prefHeight="67.0" prefWidth="595.0" spacing="10.0">
                      <children>
                         <TextField fx:id="usernameInput" alignment="CENTER" prefHeight="20.0" prefWidth="150.0" promptText="Username" styleClass="username-box" />
+                     </children>
+                  </HBox>
+                  <HBox alignment="CENTER" prefHeight="67.0" prefWidth="595.0" spacing="10.0">
+                     <children>
+                        <TextField fx:id="passwordInput" alignment="CENTER" prefHeight="20.0" prefWidth="150.0" promptText="Password" styleClass="username-box" />
                      </children>
                   </HBox>
                   <HBox alignment="CENTER" prefHeight="100.0" prefWidth="600.0" spacing="50.0">
@@ -35,5 +40,10 @@
             </Button>
          </children>
       </VBox>
+      <Label fx:id="loginMessage" alignment="CENTER" prefHeight="400.0" prefWidth="600.0" styleClass="login-message" text="" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+         <font>
+            <Font name="Arial Bold" size="24.0" />
+         </font>
+      </Label>
    </children>
 </AnchorPane>

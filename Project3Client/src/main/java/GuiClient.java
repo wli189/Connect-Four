@@ -14,7 +14,7 @@ public class GuiClient extends Application{
 	}
 
 	public static void setClient(Client client) {
-		clientThread = client;
+		GuiClient.clientThread = client;
 	}
 
 	public static void main(String[] args) {
@@ -29,16 +29,6 @@ public class GuiClient extends Application{
 
 		primaryStage.setScene(new Scene(root));
 		primaryStage.show();
-	}
-
-	private static GameLayout gameController;
-
-	public static void setGameController(GameLayout controller) {
-		gameController = controller;
-	}
-
-	public static GameLayout getGameController() {
-		return gameController;
 	}
 
 }

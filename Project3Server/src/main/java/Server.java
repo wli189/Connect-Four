@@ -166,17 +166,20 @@ public class Server {
 				connection.setTcpNoDelay(true);
 
 				Object data = in.readObject();
-				if (data instanceof String message && message.startsWith("USERNAME:")) {
-					String requestedUsername = message.substring(9);
+				if (data instanceof String message && message.startsWith("LOGIN:")) {
+					String loginInfo = message.substring(6);
+					String[] loginInfoArr = loginInfo.split(":");
+					String requestedUsername = loginInfoArr[0];
+					String requestedPassword = loginInfoArr[1];
 					// checks if username is taken
 					synchronized (usernames) {
 						if (usernames.contains(requestedUsername)) {
 							sendToSelf("USERNAME_ERROR: User already login in. Please try again later or choose another username.");
-							connection.close();
 							return false;
 						} else {
 							usernames.add(requestedUsername);
 							this.username = requestedUsername;
+							sendToSelf("LOGIN_SUCCESS: " + requestedUsername);
 						}
 					}
 					return true;
