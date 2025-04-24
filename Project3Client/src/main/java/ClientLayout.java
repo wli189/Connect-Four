@@ -3,6 +3,7 @@ import javafx.fxml.FXML;
 import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
+import javafx.scene.control.Alert;
 import javafx.scene.control.Button;
 import javafx.application.Platform;
 import javafx.scene.control.TextField;
@@ -28,6 +29,12 @@ public class ClientLayout {
     @FXML
     private void handleStartButtonClick() throws Exception {
         String username = usernameInput.getText().trim();
+        if (username.isEmpty()) {
+            // Show error message to the user
+            showError("Username cannot be empty!");
+            return; // Stop execution
+        }
+
         Client clientThread = new Client();
         clientThread.setUsername(username);
         clientThread.start();
@@ -84,5 +91,13 @@ public class ClientLayout {
         currentStage.setScene(leaderboardScene);
         fadeTransition.play();
         currentStage.show();
+    }
+
+    private void showError(String message) {
+        Alert alert = new Alert(Alert.AlertType.ERROR);
+        alert.setTitle("Error");
+        alert.setHeaderText(null);
+        alert.setContentText(message);
+        alert.showAndWait();
     }
 }
