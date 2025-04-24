@@ -18,6 +18,7 @@ public class Client extends Thread {
 	private String opponentPlayerUsername;
 	private int playerID;
 	private int opponentPlayerID;
+	private String winner;
 
 	public Client() {
 		this.username = "";
@@ -60,7 +61,20 @@ public class Client extends Thread {
 
 							if (!gameEnded) {
 								if (status.equals("WIN")) {
-									controller.showEndMessage("Player " + currentPlayer + " wins!");
+									if (currentPlayer == 1) {
+										if (playerID == 1) {
+											winner = player1Username;
+										} else if (playerID == 2) {
+											winner = opponentPlayerUsername;
+										}
+									} else if (currentPlayer == 2) {
+										if (playerID == 1) {
+											winner = opponentPlayerUsername;
+										} else if (playerID == 2) {
+											winner = player2Username;
+										}
+									}
+									controller.showEndMessage(winner + " wins!");
 									gameEnded = true; // Prevent further end messages
 								} else if (status.equals("DRAW")) {
 									controller.showEndMessage("It's a draw!");
