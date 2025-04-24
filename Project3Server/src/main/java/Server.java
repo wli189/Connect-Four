@@ -46,7 +46,7 @@ public class Server {
 		}
     }
 
-
+	// Create a new user record in the database if it doesn't exist
 	private static void createNewUserRecord(String username) {
 		try {
 			String createUserSQL = """
@@ -189,12 +189,16 @@ public class Server {
 		}
 
 		void postInitialize() {
-			if (playerID == 2) {
-				sendToSelf("OPPONENT_PLAYER: 2 - "+ gameThread.player1.getDisplayName()); // Tell player 2 the player 1's username
-			}
-			sendToSelf("PLAYER: " + playerID + " - " + getDisplayName()); // Send player ID to client
+			try {
+				if (playerID == 2) {
+					sendToSelf("OPPONENT_PLAYER: 2 - " + gameThread.player1.getDisplayName()); // Tell player 2 the player 1's username
+				}
+				sendToSelf("PLAYER: " + playerID + " - " + getDisplayName()); // Send player ID to client
 
-			createNewUserRecord(getDisplayName());
+				createNewUserRecord(getDisplayName());
+			} catch (Exception e) {
+				System.err.println("Error initializing client #" + count + ": " + e.getMessage());
+			}
 		}
 
 		// Set game for this client and assign player ID
@@ -253,7 +257,7 @@ public class Server {
 			while (true) {
 				try {
 					Object data = in.readObject();
-					System.out.println("Client #" + count + " sent: " + data);
+//					System.out.println("Client #" + count + " sent: " + data);
 
 					if (data instanceof Message message) {
 						// Handle move if the message is a move
@@ -276,7 +280,7 @@ public class Server {
 							ClientThread opponent = (playerID == 1) ? gameThread.player2 : gameThread.player1;
 							if (opponent != null) {
 								try {
-									opponent.sendToSelf("SERVER: " + this.getDisplayName() + " disconnected \nBack to start a new game");
+									opponent.sendToSelf("SERVER: " + this.getDisplayName() + " disconnected \nGame ended! Back to start a new game");
 								} catch (Exception ex) {
 									ex.printStackTrace();
 								}

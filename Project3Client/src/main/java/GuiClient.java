@@ -18,14 +18,6 @@ public class GuiClient extends Application{
 	}
 
 	public static void main(String[] args) {
-//		Client clientThread = new Client();
-//		clientThread.start();
-//		Scanner s = new Scanner(System.in);
-//		while (s.hasNext()){
-//			String x = s.next();
-//			clientThread.send(x);
-//		}
-
 		launch(args);
 	}
 
@@ -48,9 +40,5 @@ public class GuiClient extends Application{
 	public static GameLayout getGameController() {
 		return gameController;
 	}
-
-
-
-
 
 }

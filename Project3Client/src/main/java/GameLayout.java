@@ -89,7 +89,7 @@ public class GameLayout {
         }
     }
     private void handleColumnClick(int col) {
-        System.out.println("Clicked column: " + col);
+//        System.out.println("Clicked column: " + col);
         GuiClient.getClient().sendMove(col);
     }
 
