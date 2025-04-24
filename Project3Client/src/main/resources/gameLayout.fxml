@@ -7,12 +7,12 @@
 
 <AnchorPane prefHeight="700.0" prefWidth="1000.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GameLayout">
     <children>
-        <Label fx:id="usernameLabel" alignment="CENTER" layoutY="21.0" textAlignment="CENTER" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="250.0">
+        <Label fx:id="usernameLabel" alignment="CENTER" layoutX="250.0" layoutY="50.0" textAlignment="CENTER" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="250.0">
             <font>
                 <Font name="Arial" size="12.0" />
             </font>
         </Label>
-      <HBox alignment="CENTER" layoutY="79.0" prefHeight="417.0" prefWidth="1000.0" spacing="50.0">
+      <HBox alignment="CENTER" layoutX="-14.0" layoutY="132.0" prefHeight="417.0" prefWidth="1000.0" spacing="50.0">
          <children>
               <!-- Game Board Pane -->
               <Pane prefHeight="417.0" prefWidth="468.0" styleClass="board-pane">
@@ -31,7 +31,7 @@
                       </GridPane>
                   </children>
               </Pane>
-      
+
                     <!-- Chat UI -->
               <VBox fx:id="chatBox" prefHeight="417.0" prefWidth="351.0" spacing="10" styleClass="chat-box">
                   <!-- Output Area -->
@@ -40,7 +40,7 @@
                      <Font name="Arial" size="18.0" />
                   </font>
                </TextArea>
-      
+
                         <!-- Input Area- -->
                   <HBox alignment="CENTER" prefHeight="91.0" prefWidth="347.0" spacing="5">
                       <children>
@@ -56,16 +56,15 @@
               </VBox>
          </children>
       </HBox>
-
-        <!-- Error message-->
-        <Label fx:id="messageLabel" layoutX="71.0" layoutY="529.0" prefHeight="92.0" prefWidth="858.0" textFill="RED">
-         <font>
-            <Font name="System Bold" size="14.0" />
-         </font></Label>
-        <VBox layoutX="460.0" layoutY="581.0" alignment="CENTER" spacing="15">
-            <Button fx:id="rematchButton" text="Rematch" styleClass="button-style" onAction="#handleRematchButtonClick" visible="false" />
-            <Button fx:id="backButton"  mnemonicParsing="false" onAction="#handleBackButtonClick" styleClass="button-style" text="Back" />
+        <VBox alignment="CENTER" layoutX="460.0" layoutY="581.0" spacing="15">
+            <Button fx:id="rematchButton" onAction="#handleRematchButtonClick" styleClass="button-style" text="Rematch" visible="false" />
+            <Button fx:id="backButton" mnemonicParsing="false" onAction="#handleBackButtonClick" styleClass="button-style" text="Back" />
 
         </VBox>
+        <Label fx:id="fullscreenMessage" alignment="CENTER" prefHeight="700.0" prefWidth="1000.0" styleClass="fullscreen-message" text="" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <font>
+                <Font name="Arial Bold" size="24.0" />
+            </font>
+        </Label>
     </children>
 </AnchorPane>

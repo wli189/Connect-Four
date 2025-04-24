@@ -18,10 +18,9 @@ import javafx.util.Duration;
 public class GameLayout {
     @FXML
     private GridPane boardGrid;
+
     @FXML
     private Button rematchButton;
-    @FXML
-    private Label messageLabel;
 
     @FXML
     private Button backButton;
@@ -37,6 +36,9 @@ public class GameLayout {
 
     @FXML
     private Label usernameLabel;
+
+    @FXML
+    private Label fullscreenMessage;
 
     private final int rows = 6;
     private final int cols = 7;
@@ -57,7 +59,6 @@ public class GameLayout {
                 int clickedCol = col;
                 circle.setOnMouseClicked(event -> {
                     handleColumnClick(clickedCol);
-                    messageLabel.setText("");  // Clear the message label
                 });
                 boardGrid.add(circle, col, row);
             }
@@ -83,7 +84,6 @@ public class GameLayout {
                 int clickedCol = col;
                 circle.setOnMouseClicked(event -> {
                     handleColumnClick(clickedCol);
-                    messageLabel.setText("");  // Clear the message label
                 });
 
                 boardGrid.add(circle, col, row);
@@ -102,7 +102,7 @@ public class GameLayout {
             client.resetGame();  // Clear local game state
             client.sendRematchRequest();  // Ask server to re-pair players
             drawEmptyBoard();  // Reset board visuals
-            showMessage("Rematch request sent. Waiting for opponent...");
+            showMessage("Rematch request sent. Waiting for opponent...", false);
             // will disable the rematch button as it is waiting
             rematchButton.setVisible(false);
         }
@@ -152,100 +152,56 @@ public class GameLayout {
     // Show a message when the game ends
     public void showEndMessage(String message) {
         Platform.runLater(() -> {
-            messageLabel.setText(message);
-            rematchButton.setVisible(true);
+            fullscreenMessage.setText(message);
+            fullscreenMessage.setStyle("-fx-background-color: rgba(0, 128, 0, 0.7); -fx-text-fill: white;");
+
+            // Fade in
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(500), fullscreenMessage);
+            fadeIn.setFromValue(0.0);
+            fadeIn.setToValue(1.0);
+            fullscreenMessage.setVisible(true);
+            fadeIn.play();
+
+            // Fade out after 2 seconds
+            FadeTransition fadeOut = new FadeTransition(Duration.millis(500), fullscreenMessage);
+            fadeOut.setFromValue(1.0);
+            fadeOut.setToValue(0.0);
+            fadeOut.setDelay(Duration.seconds(2));
+            fadeOut.setOnFinished(event -> {
+                fullscreenMessage.setVisible(false);
+                rematchButton.setVisible(true);
+            });
+            fadeOut.play();
         });
-        /*
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.INFORMATION);
-            alert.setTitle("Game Over");
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
-
-            // Navigate back to ClientLayout after the alert
-            try {
-                Client clientThread = GuiClient.getClient();
-                if (clientThread != null) {
-                    clientThread.disconnect(); // Disconnect the client
-                    GuiClient.setClient(null); // Clear the client reference
-                }
-
-                // Load the ClientLayout
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("clientLayout.fxml"));
-                Parent root = loader.load();
-
-                // Create the new scene
-                Scene clientScene = new Scene(root);
-
-                root.setOpacity(0); // Start fully transparent
-                FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), root); // 500ms duration
-                fadeTransition.setFromValue(0.0); // Start opacity
-                fadeTransition.setToValue(1.0);   // End opacity
-
-                // Get the current stage
-                Stage currentStage = (Stage) messageLabel.getScene().getWindow();
-
-                // Set the new scene
-                currentStage.setScene(clientScene);
-                fadeTransition.play();
-                currentStage.show();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-
-         */
     }
 
     // Show a notice message
-    public void showMessage(String message) {
-        messageLabel.setText(message);
+    public void showMessage(String message, boolean isError) {
+        Platform.runLater(() -> {
+            fullscreenMessage.setText(message);
+            fullscreenMessage.setStyle("-fx-background-color: " + (!isError ? "rgba(0, 128, 0, 0.7)" : "rgba(255, 0, 0, 0.7)") + "; -fx-text-fill: white;");
+
+            // Fade in
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(200), fullscreenMessage);
+            fadeIn.setFromValue(0.0);
+            fadeIn.setToValue(1.0);
+            fullscreenMessage.setVisible(true);
+            fadeIn.play();
+
+            // Fade out after 2 seconds
+            FadeTransition fadeOut = new FadeTransition(Duration.millis(200), fullscreenMessage);
+            fadeOut.setFromValue(1.0);
+            fadeOut.setToValue(0.0);
+            fadeOut.setDelay(Duration.seconds(1));
+            fadeOut.setOnFinished(event -> {
+                fullscreenMessage.setVisible(false);
+            });
+            fadeOut.play();
+        });
     }
 
     public void showUsername(String username) {
     	usernameLabel.setText(username);
     }
 
-    // Show a duplicate username message
-    public void showDuplicateUsernameMessage(String message) {
-        Platform.runLater(() -> {
-            Alert alert = new Alert(Alert.AlertType.ERROR);
-            alert.setTitle("Duplicate Username");
-            alert.setHeaderText(null);
-            alert.setContentText(message);
-            alert.showAndWait();
-
-            // Navigate back to ClientLayout after the alert
-            try {
-                Client clientThread = GuiClient.getClient();
-                if (clientThread != null) {
-                    clientThread.disconnect(); // Disconnect the client
-                    GuiClient.setClient(null); // Clear the client reference
-                }
-
-                // Load the ClientLayout
-                FXMLLoader loader = new FXMLLoader(getClass().getResource("clientLayout.fxml"));
-                Parent root = loader.load();
-
-                // Create the new scene
-                Scene clientScene = new Scene(root);
-
-                root.setOpacity(0); // Start fully transparent
-                FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), root); // 500ms duration
-                fadeTransition.setFromValue(0.0); // Start opacity
-                fadeTransition.setToValue(1.0);   // End opacity
-
-                // Get the current stage
-                Stage currentStage = (Stage) messageLabel.getScene().getWindow();
-
-                // Set the new scene
-                currentStage.setScene(clientScene);
-                fadeTransition.play();
-                currentStage.show();
-            } catch (Exception e) {
-                e.printStackTrace();
-            }
-        });
-    }
 }

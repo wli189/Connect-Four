@@ -56,6 +56,7 @@ public class Client extends Thread {
 			out.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
+			Platform.runLater(() -> controller.showLoginMessage("Failed to connect to server!", false));
 			return;
 		}
 
@@ -97,7 +98,7 @@ public class Client extends Thread {
 				// Handle server messages
 				else if (obj instanceof String message) {
 					System.out.println(message);
-					if (message.startsWith("ERROR:") || message.startsWith("SERVER:") || message.startsWith("OPPONENT_PLAYER:")) {
+					if (message.startsWith("ERROR:") || message.startsWith("SERVER:") || message.startsWith("OPPONENT_PLAYER:") || message.startsWith("GAME_OVER:")) {
 						Platform.runLater(() -> {
 							handleServerMessage(message);
 						});
@@ -122,9 +123,9 @@ public class Client extends Thread {
 			String status = gameState.getStatus();
 			int currentPlayer = gameState.getCurrentPlayer();
 
-			System.out.println("Updating board in UI with: " + Arrays.deepToString(board));
+//			System.out.println("Updating board in UI with: " + Arrays.deepToString(board));
 			gameController.updateBoard(board);
-			System.out.println("Board updated in UI");
+//			System.out.println("Board updated in UI");
 
 			if (!gameEnded) {
 				if (status.equals("WIN")) {
@@ -156,27 +157,27 @@ public class Client extends Thread {
 	private void handleServerMessage(String message) {
 		try {
 			if (message.startsWith("ERROR:")) {
-				gameController.showMessage(message.substring(7));
+				gameController.showMessage(message.substring(7), true);
 			} else if (message.startsWith("PLAYER:")) {
 				String[] parts = message.split(" - ", 2);
 				String id = parts[0].substring(8);
 				playerID = Integer.parseInt(id.trim());
 				if (playerID == 1) {
 					player1Username = parts[1];
-					gameController.showMessage("You are Player " + playerID + " - " + this.getUsername() + "\n" + player1Username + " goes first. Wait for your opponent to join.");
+					gameController.showMessage("You are Player " + playerID + " - " + this.getUsername() + "\n" + player1Username + " goes first. Wait for your opponent to join.", false);
 				} else if (playerID == 2) {
 					player2Username = parts[1];
-					gameController.showMessage("You are Player " + playerID + " - " + this.getUsername() + "\n" + opponentPlayerUsername + " goes first");
+					gameController.showMessage("You are Player " + playerID + " - " + this.getUsername() + "\n" + opponentPlayerUsername + " goes first", false);
 				}
 				gameController.showUsername(this.getUsername());
 			} else if (message.startsWith("SERVER:")) {
-				gameController.showMessage(message.substring(8));
+				gameController.showMessage(message.substring(8), false);
 			} else if (message.startsWith("OPPONENT_PLAYER:")) {
 				String[] parts = message.split(" - ", 2);
 				String id = parts[0].substring(17);
 				opponentPlayerID = Integer.parseInt(id.trim());
 				opponentPlayerUsername = parts[1];
-				System.out.println("Opponent Player ID: " + opponentPlayerID + " - " + opponentPlayerUsername);
+//				System.out.println("Opponent Player ID: " + opponentPlayerID + " - " + opponentPlayerUsername);
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -213,6 +214,18 @@ public class Client extends Thread {
 			Message moveMessage = new Message("MAKE_MOVE", String.valueOf(col));
 			out.writeObject(moveMessage);
 			out.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+		}
+	}
+
+	// Rematch will be sent to server
+	public void sendRematchRequest() {
+		try {
+			Message rematchMessage = new Message("REMATCH", "Requesting rematch");
+			out.writeObject(rematchMessage);
+			out.flush();
+//			System.out.println("Sent rematch request to server");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}

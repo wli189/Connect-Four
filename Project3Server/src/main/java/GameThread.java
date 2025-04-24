@@ -60,21 +60,6 @@ public class GameThread {
         if (win) {
             Server.updateUserRecord(winner.getDisplayName(), true);
             Server.updateUserRecord(loser.getDisplayName(), false);
-
-            // Ask both players for rematch
-            if (player1 != null && !player1.connection.isClosed()) {
-                player1.sendToSelf("GAME_OVER: You " + (player1 == winner ? "won" : "lost"));
-            }
-            if (player2 != null && !player2.connection.isClosed()) {
-                player2.sendToSelf("GAME_OVER: You " + (player2 == winner ? "won" : "lost"));
-            }
-        } else if (draw) {
-            if (player1 != null && !player1.connection.isClosed()) {
-                player1.sendToSelf("GAME_OVER: Draw!");
-            }
-            if (player2 != null && !player2.connection.isClosed()) {
-                player2.sendToSelf("GAME_OVER: Draw!");
-            }
         }
 
         GameState gameState = new GameState(board, game.getCurrentPlayer(), status);

@@ -157,13 +157,16 @@ public class Server {
 			this.count = count;
 			this.username = null;
 		}
+
+		// Rematch
 		private void handleRematchRequest() {
 			wantsRematch = true;
 			ClientThread opponent = (playerID == 1) ? gameThread.player2 : gameThread.player1;
+			opponent.sendToSelf( "SERVER: Opponent wants rematch.");
 
 			if (opponent != null && opponent.wantsRematch) {
 				// Both players want a rematch, create a new game
-				System.out.println("Both players want rematch. Starting a new game.");
+//				System.out.println("Both players want rematch. Starting a new game.");
 
 				GameThread newGame = new GameThread(this, opponent);
 				synchronized (games) {
@@ -188,6 +191,7 @@ public class Server {
 				sendToSelf("SERVER: Waiting for opponent to accept rematch...");
 			}
 		}
+
 		// Initialize client by reading username from client and send it to client
 		boolean preInitialize() {
 			try {
