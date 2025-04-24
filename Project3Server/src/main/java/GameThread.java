@@ -16,6 +16,11 @@ public class GameThread {
         this.player1 = player1;
         this.gameId = ++gameCounter;
     }
+    public GameThread(Server.ClientThread player1, Server.ClientThread player2) {
+        this.player1 = player1;
+        this.player2 = player2;
+        this.gameId = ++gameCounter;
+    }
 
     // Set player 2
     public void setPlayer2(Server.ClientThread player2) {
@@ -53,8 +58,23 @@ public class GameThread {
         Server.ClientThread loser = (game.getCurrentPlayer() == 1) ? player2 : player1;
 
         if (win) {
-            Server.updateUserRecord(winner.getDisplayName(), true); // Win for current player
-            Server.updateUserRecord(loser.getDisplayName(), false); // Loss for opponent
+            Server.updateUserRecord(winner.getDisplayName(), true);
+            Server.updateUserRecord(loser.getDisplayName(), false);
+
+            // Ask both players for rematch
+            if (player1 != null && !player1.connection.isClosed()) {
+                player1.sendToSelf("GAME_OVER: You " + (player1 == winner ? "won" : "lost"));
+            }
+            if (player2 != null && !player2.connection.isClosed()) {
+                player2.sendToSelf("GAME_OVER: You " + (player2 == winner ? "won" : "lost"));
+            }
+        } else if (draw) {
+            if (player1 != null && !player1.connection.isClosed()) {
+                player1.sendToSelf("GAME_OVER: Draw!");
+            }
+            if (player2 != null && !player2.connection.isClosed()) {
+                player2.sendToSelf("GAME_OVER: Draw!");
+            }
         }
 
         GameState gameState = new GameState(board, game.getCurrentPlayer(), status);

@@ -218,6 +218,7 @@ public class Client extends Thread {
 		}
 	}
 
+	// Reset game state for a new game
 	public void resetGame() {
 		gameEnded = false;
 	}
