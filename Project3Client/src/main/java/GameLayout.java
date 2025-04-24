@@ -175,7 +175,7 @@ public class GameLayout {
         });
     }
 
-    // Show a notice message
+    // Show a message
     public void showMessage(String message, boolean isError) {
         Platform.runLater(() -> {
             fullscreenMessage.setText(message);

@@ -47,14 +47,14 @@ public class Server {
     }
 
 	// Create a new user record in the database if it doesn't exist
-	private static void createNewUserRecord(String username) {
+	private static void createNewUserRecord(String username, String password) {
 		try {
 			String createUserSQL = """
 					INSERT INTO user_records (username, password, wins, losses) VALUES (?, ?, ?, ?)
 					""";
 			PreparedStatement pstmt = dbConnection.prepareStatement(createUserSQL);
 			pstmt.setString(1, username);
-			pstmt.setString(2, "");
+			pstmt.setString(2, password);
 			pstmt.setInt(3, 0);
 			pstmt.setInt(4, 0);
 			pstmt.executeUpdate();
@@ -67,7 +67,7 @@ public class Server {
 
 	public static void updateUserRecord(String username, boolean isWin) throws SQLException {
 		// Ensure user exists
-		createNewUserRecord(username);
+		createNewUserRecord(username, "");
 		String updateSQL = "";
 		// Update wins or losses
 		if (isWin) {
@@ -151,6 +151,7 @@ public class Server {
 		int playerID;
 		String username;
 		boolean wantsRematch = false;
+		private String password;
 
 		ClientThread(Socket s, int count){
 			this.connection = s;
@@ -192,6 +193,15 @@ public class Server {
 			}
 		}
 
+		boolean verifyCredentials(String username, String password, String dbPassword) {
+			if (dbPassword.equals(password) && dbPassword != null) {
+				this.password = password;
+				return true;
+			} else {
+				return false;
+			}
+		}
+
 		// Initialize client by reading username from client and send it to client
 		boolean preInitialize() {
 			try {
@@ -206,19 +216,38 @@ public class Server {
 					String[] loginInfoArr = loginInfo.split(":");
 					String requestedUsername = loginInfoArr[0];
 					String requestedPassword = loginInfoArr[1];
-					// checks if username is taken
 					synchronized (usernames) {
-						if (usernames.contains(requestedUsername)) {
-							sendToSelf("USERNAME_ERROR: User already login in. Please try again later or choose another username.");
-							return false;
+						String matchSQL = "SELECT password FROM user_records WHERE username = ?";
+						PreparedStatement pstmt = dbConnection.prepareStatement(matchSQL);
+						pstmt.setString(1, requestedUsername);
+						ResultSet rs = pstmt.executeQuery();
+
+						if (rs.next()) {
+							// Username exists, verify password
+							String dbPassword = rs.getString("password");
+							if (verifyCredentials(requestedUsername, requestedPassword, dbPassword)) {
+								// Check if the user has logged in
+								if (usernames.contains(requestedUsername)) {
+									sendToSelf("USERNAME_ERROR: User already login in. Please try again later or choose another username.");
+									return false;
+								}
+								usernames.add(requestedUsername);
+								this.username = requestedUsername;
+								sendToSelf("LOGIN_SUCCESS: " + requestedUsername);
+								return true;
+							} else {
+								sendToSelf("LOGIN_ERROR: Invalid username or password.");
+								return false;
+							}
 						} else {
+							// Username doesn't exist, create new account
+							createNewUserRecord(requestedUsername, requestedPassword);
 							usernames.add(requestedUsername);
 							this.username = requestedUsername;
 							sendToSelf("LOGIN_SUCCESS: " + requestedUsername);
+							return true;
 						}
 					}
-					return true;
-//					System.out.println("Client #" + count + " set username to: " + username);
 				}
 			} catch (Exception e) {
 				System.err.println("Error initializing client #" + count + ": " + e.getMessage());
@@ -232,8 +261,6 @@ public class Server {
 					sendToSelf("OPPONENT_PLAYER: 2 - " + gameThread.player1.getDisplayName()); // Tell player 2 the player 1's username
 				}
 				sendToSelf("PLAYER: " + playerID + " - " + getDisplayName()); // Send player ID to client
-
-				createNewUserRecord(getDisplayName());
 			} catch (Exception e) {
 				System.err.println("Error initializing client #" + count + ": " + e.getMessage());
 			}
@@ -251,6 +278,10 @@ public class Server {
 				return username;
 			}
 			return "Client #" + count;
+		}
+
+		public String getPassword() {
+			return password;
 		}
 
 		// Broadcast message to all clients
