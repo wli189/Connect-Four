@@ -52,10 +52,12 @@ public class GameLayout {
 
     public void drawEmptyBoard() {
         boardGrid.getChildren().clear();
+        boardGrid.setHgap(10); // Add 10px between cells
+        boardGrid.setVgap(10);
         for (int row = 0; row < rows; row++) {
             for (int col = 0; col < cols; col++) {
                 Circle circle = new Circle(30);
-                circle.setFill(Color.LIGHTGRAY);
+                circle.getStyleClass().add("game-circle");
                 int clickedCol = col;
                 circle.setOnMouseClicked(event -> {
                     handleColumnClick(clickedCol);
@@ -67,6 +69,8 @@ public class GameLayout {
 
     public void updateBoard(int[][] board) {
         boardGrid.getChildren().clear(); // Clear the previous board
+        boardGrid.setHgap(10); // Add 10px between cells
+        boardGrid.setVgap(10);
 
         // Draw the new board
         for (int row = 0; row < rows; row++) {
@@ -74,11 +78,11 @@ public class GameLayout {
                 Circle circle = new Circle(30);
                 int value = board[row][col];
                 if (value == 1) {
-                    circle.setFill(Color.RED);
+                    circle.getStyleClass().add("game-circle-red");
                 } else if (value == 2) {
-                    circle.setFill(Color.YELLOW);
+                    circle.getStyleClass().add("game-circle-yellow");
                 } else {
-                    circle.setFill(Color.LIGHTGRAY);
+                    circle.getStyleClass().add("game-circle");
                 }
 
                 int clickedCol = col;
@@ -153,8 +157,22 @@ public class GameLayout {
     // Show a message when the game ends
     public void showEndMessage(String message) {
         Platform.runLater(() -> {
+            // Determine background color based on game outcome
+            String backgroundColor = "";
+            String textColor = "";
+            if (message.toLowerCase().contains("draw")) {
+                backgroundColor = "rgba(255, 255, 0, 0.7)"; // Yellow for draw
+                textColor = "Black";
+            } else if (message.toLowerCase().contains("won")) {
+                backgroundColor = "rgba(0, 128, 0, 0.7)"; // Green for win
+                textColor = "White";
+            } else if (message.toLowerCase().contains("lost")) {
+                backgroundColor = "rgba(255, 0, 0, 0.7)"; // Red for loss
+                textColor = "White";
+            }
+
             fullscreenMessage.setText(message);
-            fullscreenMessage.setStyle("-fx-background-color: rgba(0, 128, 0, 0.7); -fx-text-fill: white;");
+            fullscreenMessage.setStyle("-fx-background-color: " + backgroundColor + "; -fx-text-fill: " + textColor + ";");
 
             // Fade in
             FadeTransition fadeIn = new FadeTransition(Duration.millis(500), fullscreenMessage);

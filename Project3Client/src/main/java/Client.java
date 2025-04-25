@@ -150,23 +150,15 @@ public class Client extends Thread {
 
 			if (!gameEnded) {
 				if (gameStatus.equals("WIN")) {
-					if (currentPlayer == 1) {
-						if (playerID == 1) {
-							winner = player1Username;
-						} else if (playerID == 2) {
-							winner = opponentPlayerUsername;
-						}
-					} else if (currentPlayer == 2) {
-						if (playerID == 1) {
-							winner = opponentPlayerUsername;
-						} else if (playerID == 2) {
-							winner = player2Username;
-						}
+					if (currentPlayer == playerID) {
+						gameController.showEndMessage("WON!");
+					} else {
+						gameController.showEndMessage("LOST!");
 					}
-					gameController.showEndMessage(winner + " wins!");
+
 					gameEnded = true;
 				} else if (gameStatus.equals("DRAW")) {
-					gameController.showEndMessage("It's a draw!");
+					gameController.showEndMessage("IT'S DRAW!");
 					gameEnded = true;
 				}
 			}

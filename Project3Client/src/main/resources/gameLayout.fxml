@@ -5,20 +5,20 @@
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
-<AnchorPane prefHeight="700.0" prefWidth="1000.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GameLayout">
+<AnchorPane prefHeight="700.0" prefWidth="1000.0" styleClass="background-color" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="GameLayout">
     <children>
-        <Label fx:id="usernameLabel" alignment="CENTER" layoutX="250.0" layoutY="50.0" textAlignment="CENTER" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="250.0">
+        <Label fx:id="usernameLabel" alignment="CENTER" layoutX="250.0" layoutY="31.0" textAlignment="CENTER" AnchorPane.leftAnchor="250.0" AnchorPane.rightAnchor="250.0">
             <font>
                 <Font name="Arial" size="12.0" />
             </font>
         </Label>
-      <HBox alignment="CENTER" layoutX="-14.0" layoutY="132.0" prefHeight="417.0" prefWidth="1000.0" spacing="50.0">
+      <HBox alignment="CENTER" layoutY="102.0" prefHeight="470.0" prefWidth="1000.0" spacing="50.0">
          <children>
               <!-- Game Board Pane -->
-              <Pane prefHeight="417.0" prefWidth="468.0" styleClass="board-pane">
+              <Pane prefHeight="500.0" prefWidth="520.0" styleClass="board-pane">
                   <children>
                       <!-- Game Board Grid -->
-                      <GridPane fx:id="boardGrid" layoutX="24.0" layoutY="29.0" prefHeight="360.0" prefWidth="420.0" styleClass="board-grid">
+                      <GridPane fx:id="boardGrid" layoutX="20.0" layoutY="25.0" prefHeight="420.0" prefWidth="480.0" styleClass="board-grid">
                           <columnConstraints>
                               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                               <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
@@ -33,9 +33,9 @@
               </Pane>
 
                     <!-- Chat UI -->
-              <VBox fx:id="chatBox" prefHeight="417.0" prefWidth="351.0" spacing="10" styleClass="chat-box">
+              <VBox fx:id="chatBox" prefHeight="500.0" prefWidth="344.0" spacing="10" styleClass="chat-box">
                   <!-- Output Area -->
-                  <TextArea fx:id="chatOutput" editable="false" prefHeight="320.0" prefWidth="341.0" promptText="Chat messages..." styleClass="chat-output" wrapText="true">
+                  <TextArea fx:id="chatOutput" editable="false" prefHeight="407.0" prefWidth="330.0" promptText="Chat messages..." styleClass="chat-output" wrapText="true">
                   <font>
                      <Font name="Arial" size="18.0" />
                   </font>
@@ -43,12 +43,12 @@
 
                         <!-- Input Area- -->
                   <HBox alignment="CENTER" prefHeight="91.0" prefWidth="347.0" spacing="5">
-                      <children>
+                  <children>
                           <!-- Input Field -->
                           <TextField fx:id="chatInput" prefHeight="35.0" prefWidth="251.0" promptText="Type a message..." styleClass="chat-input" />
                           <!-- Send Button -->
                           <Button fx:id="sendButton" prefHeight="35.0" prefWidth="91.0" styleClass="send-button" text="Send" />
-                      </children>
+                  </children>
                   </HBox>
                   <padding>
                       <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />

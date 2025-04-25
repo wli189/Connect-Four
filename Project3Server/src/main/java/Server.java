@@ -167,9 +167,11 @@ public class Server {
 			ClientThread opponent = (playerID == 1) ? gameThread.player2 : gameThread.player1;
 			Message msg = new Message("SERVER", "Opponent wants rematch");
 			opponent.sendToSelf(msg);
+			System.out.println("Player #" + playerID + " wants to rematch");
 
 			if (opponent != null && opponent.wantsRematch) {
 				// Both players want a rematch, create a new game
+				System.out.println("Opponent " + opponent.getDisplayName() + " has rematched");
 
 				GameThread newGame = new GameThread(this, opponent);
 				synchronized (games) {
@@ -234,16 +236,19 @@ public class Server {
 								if (verifyCredentials(requestedUsername, requestedPassword, dbPassword)) {
 									// Check if the user has logged in
 									if (usernames.contains(requestedUsername)) {
+										System.out.println("User " + requestedUsername + " had logged in");
 										Message msg = new Message("USERNAME_ERROR", "User already login in. Please try again later.");
 										sendToSelf(msg);
 										return false;
 									}
 									usernames.add(requestedUsername);
 									this.username = requestedUsername;
+									System.out.println("User " + requestedUsername + " logged in");
 									Message msg = new Message("LOGIN_SUCCESS", requestedUsername);
 									sendToSelf(msg);
 									return true;
 								} else {
+									System.out.println("User " + requestedUsername + " inputs wrong password");
 									Message msg = new Message("LOGIN_ERROR", "Invalid username or password.");
 									sendToSelf(msg);
 									return false;
@@ -253,6 +258,7 @@ public class Server {
 								createNewUserRecord(requestedUsername, requestedPassword);
 								usernames.add(requestedUsername);
 								this.username = requestedUsername;
+								System.out.println("New user " + requestedUsername + "'s account created");
 								Message msg = new Message("LOGIN_SUCCESS", requestedUsername);
 								sendToSelf(msg);
 								return true;
@@ -260,6 +266,7 @@ public class Server {
 						}
 					}
 					if ("LEADERBOARD_REQUEST".equals(message.getType())) {
+						System.out.println("Requesting leaderboard data");
 						handleLeaderboardRequest();
 					}
 				}
@@ -348,11 +355,13 @@ public class Server {
 					if (data instanceof Message message) {
 						// Handle move if the message is a move
 						if ("MAKE_MOVE".equals(message.getType())) {
+							System.out.println("Player " + playerID + " make the move on " + message.toString() + " column");
 							handleMove(message);
 						}
 
 						// Receive chat message and send it to the opponent
 						if ("CHAT".equals(message.getType())) {
+							System.out.println("Player " + playerID + " send a chat message");
 							sendChatToOpponent(message);
 						}
 
@@ -438,6 +447,7 @@ public class Server {
 				synchronized (gameThread.gameLock) {
 					// Wait for opponent
 					if (gameThread.player2 == null) {
+						System.out.println("Player 2 not connected");
 						Message waitMsg = new Message("ERROR", "Waiting for opponent...");
 						sendToSelf(waitMsg);
 						return;
@@ -445,6 +455,7 @@ public class Server {
 
 					// Check if the game has already ended
 					if (!gameThread.isGameOngoing()) {
+						System.out.println("Game is over");
 						Message msg = new Message("ERROR", "Game has ended");
 						sendToSelf(msg);
 						return;
@@ -452,12 +463,15 @@ public class Server {
 
 					// Check if it is your turn
 					if (gameThread.game.getCurrentPlayer() != playerID) {
+						System.out.println("Player " + playerID + " wants to move in opponent turn");
 						Message msg = new Message("ERROR", "Not your turn");
 						sendToSelf(msg);
 						return;
 					}
 
 					if (gameThread.game.getCurrentPlayer() == playerID) {
+						ClientThread opponent = (playerID == 1) ? gameThread.player2 : gameThread.player1;
+						System.out.println("Player " + opponent.playerID + " can make move now");
 						Message msg = new Message("SERVER", "It is your turn");
 						sendToOpponent(msg);
 					}
@@ -465,6 +479,7 @@ public class Server {
 					// Make move
 					boolean valid = gameThread.game.makeMove(col);
 					if (!valid) {
+						System.out.println("Player " + playerID + " can't make move here");
 						Message msg = new Message("ERROR", "Invalid move");
 						sendToSelf(msg);
 						return;

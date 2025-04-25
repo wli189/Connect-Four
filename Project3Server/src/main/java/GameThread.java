@@ -70,12 +70,12 @@ public class GameThread {
             if (player1 != null && !player1.connection.isClosed()) {
                 player1.out.writeObject(gameState);
                 player1.out.flush();
-                System.out.println("GameThread #" + gameId + " Sent GameState to client #" + player1.count);
+//                System.out.println("GameThread #" + gameId + " Sent GameState to client #" + player1.count);
             }
             if (player2 != null && !player2.connection.isClosed()) {
                 player2.out.writeObject(gameState);
                 player2.out.flush();
-                System.out.println("GameThread #" + gameId + " Sent GameState to client #" + player2.count);
+//                System.out.println("GameThread #" + gameId + " Sent GameState to client #" + player2.count);
             }
         } catch (Exception e) {
             e.printStackTrace();

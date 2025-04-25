@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <?import javafx.scene.control.*?>
+<?import javafx.scene.image.*?>
 <?import javafx.scene.layout.*?>
 <?import javafx.scene.text.*?>
 
 <AnchorPane prefHeight="400.0" prefWidth="600.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="ClientLayout">
    <children>
-      <VBox alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="20.0">
+      <VBox alignment="CENTER" prefHeight="400.0" prefWidth="600.0" spacing="10.0" styleClass="background-color">
          <children>
-            <Label alignment="CENTER" text="Connect Four">
-               <font>
-                  <Font name="Arial Bold" size="27.0" />
-               </font>
-            </Label>
-            <VBox prefHeight="133.0" prefWidth="600.0" spacing="10.0">
+            <ImageView fx:id="logo" fitHeight="150.0" fitWidth="200.0" pickOnBounds="true" preserveRatio="true">
+               <image>
+                  <Image url="@logo.png" />
+               </image>
+            </ImageView>
+            <VBox prefHeight="133.0" prefWidth="600.0" spacing="20.0">
                <children>
                   <HBox alignment="CENTER" prefHeight="67.0" prefWidth="595.0" spacing="10.0">
                      <children>
@@ -33,13 +34,13 @@
                   </HBox>
                </children>
             </VBox>
-            <Button fx:id="leaderboardButton" mnemonicParsing="false" onAction="#handleLeaderboardButton" styleClass="button-style" text="Leaderboard">
-               <font>
-                  <Font name="Arial" size="12.0" />
-               </font>
-            </Button>
          </children>
       </VBox>
+      <Button fx:id="leaderboardButton" layoutX="10.0" layoutY="10.0" mnemonicParsing="false" onAction="#handleLeaderboardButton" styleClass="button-style" text="Leaderboard">
+         <font>
+            <Font name="Arial" size="12.0" />
+         </font>
+      </Button>
       <Label fx:id="loginMessage" alignment="CENTER" prefHeight="400.0" prefWidth="600.0" styleClass="login-message" text="" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
          <font>
             <Font name="Arial Bold" size="24.0" />

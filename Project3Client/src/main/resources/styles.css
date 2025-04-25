@@ -1,11 +1,16 @@
 /* styles.css */
 
+/* Background color */
+.background-color {
+    -fx-background-color: #a3c8f3;
+}
+
 /* Style for the game board container */
 .board-pane {
     -fx-border-color: #4CAF50;
     -fx-border-width: 2;
     -fx-border-radius: 15;
-    -fx-background-color: #f9f9f9;
+    -fx-background-color: #ffd49b;
     -fx-background-radius: 15;
 }
 
@@ -127,4 +132,24 @@
 
 .table-view.leaderboard-table .table-row-cell:hover {
     -fx-background-color: #d0d0d0;
+}
+
+.game-circle {
+    -fx-fill: lightgray;
+    -fx-stroke: black;
+    -fx-stroke-width: 1;
+}
+.game-circle:hover {
+    -fx-fill: #a9a9a9;
+}
+
+.game-circle-red {
+    -fx-fill: #C0392B;
+    -fx-stroke: black;
+    -fx-stroke-width: 1;
+}
+.game-circle-yellow {
+    -fx-fill: #F1C40F;
+    -fx-stroke: black;
+    -fx-stroke-width: 1;
 }
