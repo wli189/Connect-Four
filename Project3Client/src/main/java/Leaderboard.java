@@ -42,10 +42,10 @@ public class Leaderboard {
     @FXML
     private void initialize() {
         // Configure TableColumn bindings
-        rankColumn.setCellValueFactory(cellData -> cellData.getValue().rank());
-        usernameColumn.setCellValueFactory(cellData -> cellData.getValue().username());
-        winsColumn.setCellValueFactory(cellData -> cellData.getValue().wins());
-        lossesColumn.setCellValueFactory(cellData -> cellData.getValue().losses());
+        rankColumn.setCellValueFactory(cellData -> cellData.getValue().rankProperty());
+        usernameColumn.setCellValueFactory(cellData -> cellData.getValue().usernameProperty());
+        winsColumn.setCellValueFactory(cellData -> cellData.getValue().winsProperty());
+        lossesColumn.setCellValueFactory(cellData -> cellData.getValue().lossesProperty());
     }
 
 
@@ -72,10 +72,8 @@ public class Leaderboard {
     }
 
     public void updateLeaderboard(String leaderboardData) {
-        System.out.println(leaderboardData);
         ObservableList<UserRecord> records = FXCollections.observableArrayList();
         try {
-            // Example format: "rank1,username1,wins1,losses1;rank2,username2,wins2,losses2"
             String[] entries = leaderboardData.split(";");
             for (String entry : entries) {
                 String[] fields = entry.split(",");
@@ -87,8 +85,15 @@ public class Leaderboard {
                     records.add(new UserRecord(rank, username, wins, losses));
                 }
             }
-            // Update the TableView on the JavaFX Application Thread
+            // Update the TableView
             Platform.runLater(() -> leaderboardTable.setItems(records));
+
+            // Disconnect from the server after retrieving the leaderboard
+            Client client = GuiClient.getClient();
+            if (client != null) {
+                client.disconnect();
+                GuiClient.setClient(null);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }
@@ -118,4 +123,5 @@ public class Leaderboard {
             fadeOut.play();
         });
     }
+
 }

@@ -92,7 +92,6 @@ public class GameLayout {
     }
 
     private void handleColumnClick(int col) {
-//        System.out.println("Clicked column: " + col);
         GuiClient.getClient().sendMove(col);
     }
 
@@ -105,16 +104,17 @@ public class GameLayout {
             client.sendRematchRequest();  // Ask server to re-pair players
             drawEmptyBoard();  // Reset board visuals
             showMessage("Rematch request sent. Waiting for opponent...", false);
-            // will disable the rematch button as it is waiting
+            // Will disable the rematch button as it is waiting
             rematchButton.setVisible(false);
         }
     }
     @FXML
     private void handleBackButtonClick() throws Exception {
+        // Disconnect from the server
         Client client = GuiClient.getClient();
         if (client != null) {
-            client.disconnect(); // or whatever method you're using
-            GuiClient.setClient(null); // clear the reference if needed
+            client.disconnect();
+            GuiClient.setClient(null);
         }
 
         FXMLLoader loader = new FXMLLoader(getClass().getResource("clientLayout.fxml"));
@@ -163,7 +163,7 @@ public class GameLayout {
             fullscreenMessage.setVisible(true);
             fadeIn.play();
 
-            // Fade out after 2 seconds
+            // Fade out
             FadeTransition fadeOut = new FadeTransition(Duration.millis(500), fullscreenMessage);
             fadeOut.setFromValue(1.0);
             fadeOut.setToValue(0.0);
@@ -189,7 +189,7 @@ public class GameLayout {
             fullscreenMessage.setVisible(true);
             fadeIn.play();
 
-            // Fade out after 2 seconds
+            // Fade out
             FadeTransition fadeOut = new FadeTransition(Duration.millis(200), fullscreenMessage);
             fadeOut.setFromValue(1.0);
             fadeOut.setToValue(0.0);

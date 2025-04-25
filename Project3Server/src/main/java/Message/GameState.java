@@ -6,12 +6,12 @@ import java.util.Arrays;
 public class GameState implements Serializable {
     private final int[][] board;
     private final int currentPlayer;
-    private final String status; // "ONGOING", "WIN", "DRAW"
+    private final String gameStatus; // "ONGOING", "WIN", "DRAW"
 
     public GameState(int[][] board, int currentPlayer, String status) {
         this.board = deepCopy(board);  // Deepcopy prevent accident change
         this.currentPlayer = currentPlayer;
-        this.status = status;
+        this.gameStatus = status;
     }
 
     // Getters
@@ -24,10 +24,9 @@ public class GameState implements Serializable {
     }
 
     public String getStatus() {
-        return status;
+        return gameStatus;
     }
 
-    // Deep copy board
     private int[][] deepCopy(int[][] original) {
         int[][] copy = new int[original.length][];
         for (int i = 0; i < original.length; i++) {
@@ -35,4 +34,5 @@ public class GameState implements Serializable {
         }
         return copy;
     }
+
 }

@@ -264,7 +264,7 @@ public class Server {
 					}
 				}
 			} catch (Exception e) {
-				System.err.println("Error initializing client #" + count + ": " + e.getMessage());
+				System.err.println("Error preinitializing client #" + count + ": " + e.getMessage());
 			}
 			return false;
 		}
@@ -278,7 +278,7 @@ public class Server {
 				Message msg = new Message("PLAYER", playerID + " - " + getDisplayName());
 				sendToSelf(msg);  // Send player ID to client
 			} catch (Exception e) {
-				System.err.println("Error initializing client #" + count + ": " + e.getMessage());
+				System.err.println("Error postinitializing client #" + count + ": " + e.getMessage());
 			}
 		}
 
@@ -306,6 +306,7 @@ public class Server {
 				try {
 					if (t.out != null) {
 						t.out.writeObject(message);
+						t.out.flush();
 					}
 				} catch (Exception e) {
 					e.printStackTrace();
@@ -318,6 +319,7 @@ public class Server {
 			try {
 				if (out != null) {
 					out.writeObject(message);
+					out.flush();
 				}
 			} catch (Exception e) {
 				e.printStackTrace();
@@ -349,6 +351,7 @@ public class Server {
 							handleMove(message);
 						}
 
+						// Receive chat message and send it to the opponent
 						if ("CHAT".equals(message.getType())) {
 							sendChatToOpponent(message);
 						}
@@ -390,21 +393,11 @@ public class Server {
 			}
 		}
 
+		// Get leaderboard data
 		private void handleLeaderboardRequest() {
             String leaderboardData = fetchLeaderboardData();
 			Message msg = new Message("LEADERBOARD_DATA", leaderboardData);
 			sendToSelf(msg);
-			closeConnection();
-		}
-
-		private void closeConnection() {
-			try {
-				if (in != null) in.close();
-				if (out != null) out.close();
-				if (connection != null) connection.close();
-			} catch (IOException e) {
-				System.err.println("Error closing connection: " + e.getMessage());
-			}
 		}
 
 		private String fetchLeaderboardData() {
@@ -450,6 +443,13 @@ public class Server {
 						return;
 					}
 
+					// Check if the game has already ended
+					if (!gameThread.isGameOngoing()) {
+						Message msg = new Message("ERROR", "Game has ended");
+						sendToSelf(msg);
+						return;
+					}
+
 					// Check if it is your turn
 					if (gameThread.game.getCurrentPlayer() != playerID) {
 						Message msg = new Message("ERROR", "Not your turn");
@@ -476,6 +476,6 @@ public class Server {
 				e.printStackTrace();
 			}
 		}
-
 	}
+
 }

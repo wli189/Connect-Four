@@ -14,7 +14,6 @@ import javafx.util.Duration;
 import java.io.IOException;
 
 public class ClientLayout {
-
     @FXML
     private Button startButton;
 
@@ -46,6 +45,7 @@ public class ClientLayout {
             return;
         }
         if (password.isEmpty()) {
+            // Show error message to the user
             showLoginMessage("Password cannot be empty!", false);
             return;
         }
@@ -55,7 +55,7 @@ public class ClientLayout {
         clientThread.setPassword(password);
         clientThread.start();
         GuiClient.setClient(clientThread);
-        Thread.sleep(1000);
+        Thread.sleep(500);  // Wait for connection
         clientThread.sendLoginRequest();
     }
 
@@ -102,7 +102,7 @@ public class ClientLayout {
         client = new Client(this);
         client.start();
         GuiClient.setClient(client);
-        Thread.sleep(1000);
+        Thread.sleep(500);  // Wait for connection
         switchToLeaderboard();
     }
 
@@ -113,22 +113,25 @@ public class ClientLayout {
         Leaderboard leaderboardController = loader.getController();
         Client client = GuiClient.getClient();
         client.setLeaderboardController(leaderboardController);
+
         leaderboardController.showMessage("Loading leaderboard...", false); // Show loading message
-        client.sendLeaderboardRequest();
+        client.sendLeaderboardRequest();  // Send out leaderboard request
 
         Scene leaderboardScene = new Scene(root);
 
-        root.setOpacity(0);
-        FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), root);
-        fadeTransition.setFromValue(0.0);
-        fadeTransition.setToValue(1.0);
+        root.setOpacity(0); // Start fully transparent
+        FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), root); // 500ms duration
+        fadeTransition.setFromValue(0.0); // Start opacity
+        fadeTransition.setToValue(1.0);   // End opacity
 
+        // Get current window from the button
         Stage currentStage = (Stage) leaderboardButton.getScene().getWindow();
+
+        // Set the new scene on the same stage
         currentStage.setScene(leaderboardScene);
         fadeTransition.play();
         currentStage.show();
     }
-
 
     public void showLoginMessage(String message, boolean isSuccess) {
         loginMessage.setText(message);
@@ -141,7 +144,7 @@ public class ClientLayout {
         loginMessage.setVisible(true);
         fadeIn.play();
 
-        // Fade out after 2 seconds
+        // Fade out
         FadeTransition fadeOut = new FadeTransition(Duration.millis(500), loginMessage);
         fadeOut.setFromValue(1.0);
         fadeOut.setToValue(0.0);
@@ -171,7 +174,7 @@ public class ClientLayout {
             fullscreenMessage.setVisible(true);
             fadeIn.play();
 
-            // Fade out after 2 seconds
+            // Fade out
             FadeTransition fadeOut = new FadeTransition(Duration.millis(200), fullscreenMessage);
             fadeOut.setFromValue(1.0);
             fadeOut.setToValue(0.0);
@@ -182,4 +185,5 @@ public class ClientLayout {
             fadeOut.play();
         });
     }
+
 }

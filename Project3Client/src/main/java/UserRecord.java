@@ -14,19 +14,19 @@ public class UserRecord {
         this.losses = new SimpleIntegerProperty(losses);
     }
 
-    public SimpleIntegerProperty rank() {
+    public SimpleIntegerProperty rankProperty() {
         return rank;
     }
 
-    public SimpleStringProperty username() {
+    public SimpleStringProperty usernameProperty() {
         return username;
     }
 
-    public SimpleIntegerProperty wins() {
+    public SimpleIntegerProperty winsProperty() {
         return wins;
     }
 
-    public SimpleIntegerProperty losses() {
+    public SimpleIntegerProperty lossesProperty() {
         return losses;
     }
 }

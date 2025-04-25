@@ -16,9 +16,6 @@ public class GuiServer extends Application{
 		primaryStage.setScene(new Scene(new TextField("I am not yet implemented")));
 		primaryStage.setTitle("Server");
 		primaryStage.show();
-		
 	}
-
-
 
 }

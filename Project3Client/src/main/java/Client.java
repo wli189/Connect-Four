@@ -67,7 +67,6 @@ public class Client extends Thread {
 			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
-			Platform.runLater(() -> controller.showLoginMessage("Error sending login request!", false));
 			disconnect();
 		}
 	}
@@ -78,6 +77,8 @@ public class Client extends Thread {
 			out = new ObjectOutputStream(socketClient.getOutputStream());
 			in = new ObjectInputStream(socketClient.getInputStream());
 			socketClient.setTcpNoDelay(true);
+			System.out.println("Connected to server!");
+
 		} catch (Exception e) {
 			e.printStackTrace();
 			Platform.runLater(() -> controller.showLoginMessage("Failed to connect to server!", false));
@@ -119,7 +120,7 @@ public class Client extends Thread {
 							gameController.receiveMessage(chatText);
 						});
 					}
-					if ("ERROR".equals(message.getType()) || "SERVER".equals(message.getType()) || "OPPONENT_PLAYER".equals(message.getType()) || "GAME_OVER".equals(message.getType()) || "LEADERBOARD_DATA".equals(message.getType()) || "LEADERBOARD_ERROR:".equals(message.getType())) {
+					if ("ERROR".equals(message.getType()) || "SERVER".equals(message.getType()) || "OPPONENT_PLAYER".equals(message.getType())|| "LEADERBOARD_DATA".equals(message.getType())) {
 						Platform.runLater(() -> {
 							handleServerMessage(message);
 						});
@@ -142,13 +143,13 @@ public class Client extends Thread {
 	private void handleGameState(GameState gameState) {
 		try {
 			int[][] board = gameState.getBoard();
-			String status = gameState.getStatus();
+			String gameStatus = gameState.getStatus();
 			int currentPlayer = gameState.getCurrentPlayer();
 
 			gameController.updateBoard(board);
 
 			if (!gameEnded) {
-				if (status.equals("WIN")) {
+				if (gameStatus.equals("WIN")) {
 					if (currentPlayer == 1) {
 						if (playerID == 1) {
 							winner = player1Username;
@@ -164,7 +165,7 @@ public class Client extends Thread {
 					}
 					gameController.showEndMessage(winner + " wins!");
 					gameEnded = true;
-				} else if (status.equals("DRAW")) {
+				} else if (gameStatus.equals("DRAW")) {
 					gameController.showEndMessage("It's a draw!");
 					gameEnded = true;
 				}
@@ -176,18 +177,22 @@ public class Client extends Thread {
 
 	private void handleServerMessage(Message message) {
 		try {
+			// Show error message on the game screen.
 			if ("ERROR".equals(message.getType())) {
 				gameController.showMessage(message.toString(), true);
 			}
+			// Show server message on the game screen.
 			if ("SERVER".equals(message.getType())) {
 				gameController.showMessage(message.toString(), false);
 			}
+			// Mark opponent player ID and username.
 			if ("OPPONENT_PLAYER".equals(message.getType())) {
 				String[] parts = message.toString().split(" - ", 2);
 				String id = parts[0];
 				opponentPlayerID = Integer.parseInt(id.trim());
 				opponentPlayerUsername = parts[1];
 			}
+			// Show player username on the game screen.
 			if ("PLAYER".equals(message.getType())) {
 				String[] parts = message.toString().split(" - ", 2);
 				String id = parts[0];
@@ -201,14 +206,12 @@ public class Client extends Thread {
 				}
 				gameController.showUsername(this.getUsername());
 			}
+			// Show leaderboard data on the leaderboard screen.
 			if ("LEADERBOARD_DATA".equals(message.getType())) {
 				String leaderboardData = message.toString();
 				if (leaderboardController != null) {
 					leaderboardController.updateLeaderboard(leaderboardData);
 				}
-			}
-			if ("LEADERBOARD_ERROR".equals(message.getType())) {
-				Platform.runLater(() -> controller.showLoginMessage(message.toString(), false));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -266,6 +269,7 @@ public class Client extends Thread {
 		gameEnded = false;
 	}
 
+	// Set username and password for the client
 	public void setUsername(String username) {
 		this.username = username;
 	}
@@ -274,6 +278,7 @@ public class Client extends Thread {
 		this.password = password;
 	}
 
+	// Get username for the client
 	public String getUsername() {
 		if (playerID == 1) {
 			return player1Username;
@@ -283,4 +288,5 @@ public class Client extends Thread {
 			return null;
 		}
 	}
+
 }

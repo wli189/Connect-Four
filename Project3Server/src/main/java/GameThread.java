@@ -10,6 +10,7 @@ public class GameThread {
     public Server.ClientThread player2;
     private final int gameId;
     private static int gameCounter = 0;
+    String gameStatus = "ONGOING";
 
     // Constructor
     public GameThread(Server.ClientThread player1) {
@@ -44,25 +45,27 @@ public class GameThread {
         boolean win = game.checkWin();
         boolean draw = game.isDraw();
         int[][] board = game.getBoard();
-        String status;
+
         if (win) {
-            status = "WIN";
+            gameStatus = "WIN";
         } else if (draw) {
-            status = "DRAW";
+            gameStatus = "DRAW";
         } else {
             game.switchPlayer();
-            status = "ONGOING";
+            gameStatus = "ONGOING";
         }
 
         Server.ClientThread winner = (game.getCurrentPlayer() == 1) ? player1 : player2;
         Server.ClientThread loser = (game.getCurrentPlayer() == 1) ? player2 : player1;
 
+        // Update database
         if (win) {
             Server.updateUserRecord(winner.getDisplayName(), true);
             Server.updateUserRecord(loser.getDisplayName(), false);
         }
 
-        GameState gameState = new GameState(board, game.getCurrentPlayer(), status);
+        GameState gameState = new GameState(board, game.getCurrentPlayer(), gameStatus);
+        // Send game state to both players if both players are connected
         try {
             if (player1 != null && !player1.connection.isClosed()) {
                 player1.out.writeObject(gameState);
@@ -78,4 +81,10 @@ public class GameThread {
             e.printStackTrace();
         }
     }
+
+    // Check if game is ongoing
+    public boolean isGameOngoing() {
+        return "ONGOING".equals(gameStatus);
+    }
+
 }
