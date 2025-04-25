@@ -191,8 +191,8 @@ public class Server {
 
 				Message rematchMsg = new Message("SERVER", "Starting rematch as Player 1");
 				this.sendToSelf(rematchMsg);
-				Message opponentMsg = new Message("SERVER", "Starting rematch as Player 2");
-				opponent.sendToSelf(opponentMsg);
+				Message opponetMsg = new Message("SERVER", "Starting rematch as Player 2");
+				opponent.sendToSelf(opponetMsg);
 			} else {
 				// Waiting for opponent's rematch decision
 				Message waitMsg = new Message("SERVER", "Waiting for opponent to accept rematch...");
