@@ -123,8 +123,6 @@ public class Server {
 								joinableGame.player1.sendToSelf(msg);
 								Message opponetMsg = new Message("OPPONENT_PLAYER", "1 - " + c.getDisplayName());  // Tell player 1 the player 2's username
 								joinableGame.player1.sendToSelf(opponetMsg);
-//								joinableGame.player1.sendToSelf("SERVER: Player 2 has joined: " + c.getDisplayName()); // Tell player 1 that player 2 joined
-//								joinableGame.player1.sendToSelf("OPPONENT_PLAYER: 1 - "+ c.getDisplayName());  // Tell player 1 the player 2's username
 							}
 						}
 						// Create new game
@@ -169,11 +167,9 @@ public class Server {
 			ClientThread opponent = (playerID == 1) ? gameThread.player2 : gameThread.player1;
 			Message msg = new Message("SERVER", "Opponent wants rematch");
 			opponent.sendToSelf(msg);
-//			opponent.sendToSelf( "SERVER: Opponent wants rematch.");
 
 			if (opponent != null && opponent.wantsRematch) {
 				// Both players want a rematch, create a new game
-//				System.out.println("Both players want rematch. Starting a new game.");
 
 				GameThread newGame = new GameThread(this, opponent);
 				synchronized (games) {
@@ -195,13 +191,10 @@ public class Server {
 				this.sendToSelf(rematchMsg);
 				Message opponetMsg = new Message("SERVER", "Starting rematch as Player 2");
 				opponent.sendToSelf(opponetMsg);
-//				this.sendToSelf("SERVER: Starting rematch as Player 1");
-//				opponent.sendToSelf("SERVER: Starting rematch as Player 2");
 			} else {
 				// Waiting for opponent's rematch decision
 				Message waitMsg = new Message("SERVER", "Waiting for opponent to accept rematch...");
 				sendToSelf(waitMsg);
-//				sendToSelf("SERVER: Waiting for opponent to accept rematch...");
 			}
 		}
 
@@ -270,48 +263,6 @@ public class Server {
 						handleLeaderboardRequest();
 					}
 				}
-//				if (data instanceof String message) {
-//					if (message.startsWith("LOGIN:")) {
-//						String loginInfo = message.substring(6);
-//						String[] loginInfoArr = loginInfo.split(":");
-//						String requestedUsername = loginInfoArr[0];
-//						String requestedPassword = loginInfoArr[1];
-//						synchronized (usernames) {
-//							String matchSQL = "SELECT password FROM user_records WHERE username = ?";
-//							PreparedStatement pstmt = dbConnection.prepareStatement(matchSQL);
-//							pstmt.setString(1, requestedUsername);
-//							ResultSet rs = pstmt.executeQuery();
-//
-//							if (rs.next()) {
-//								// Username exists, verify password
-//								String dbPassword = rs.getString("password");
-//								if (verifyCredentials(requestedUsername, requestedPassword, dbPassword)) {
-//									// Check if the user has logged in
-//									if (usernames.contains(requestedUsername)) {
-//										sendToSelf("USERNAME_ERROR: User already login in. Please try again later or choose another username.");
-//										return false;
-//									}
-//									usernames.add(requestedUsername);
-//									this.username = requestedUsername;
-//									sendToSelf("LOGIN_SUCCESS: " + requestedUsername);
-//									return true;
-//								} else {
-//									sendToSelf("LOGIN_ERROR: Invalid username or password.");
-//									return false;
-//								}
-//							} else {
-//								// Username doesn't exist, create new account
-//								createNewUserRecord(requestedUsername, requestedPassword);
-//								usernames.add(requestedUsername);
-//								this.username = requestedUsername;
-//								sendToSelf("LOGIN_SUCCESS: " + requestedUsername);
-//								return true;
-//							}
-//						}
-//					} else if (message.startsWith("LEADERBOARD_REQUEST")) {
-//						handleLeaderboardRequest();
-//					}
-//				}
 			} catch (Exception e) {
 				System.err.println("Error initializing client #" + count + ": " + e.getMessage());
 			}
@@ -323,11 +274,9 @@ public class Server {
 				if (playerID == 2) {
 					Message msg = new Message("OPPONENT_PLAYER", "2 - " + gameThread.player1.getDisplayName());
 					sendToSelf(msg);  // Tell player 2 the player 1's username
-//					sendToSelf("OPPONENT_PLAYER: 2 - " + gameThread.player1.getDisplayName()); // Tell player 2 the player 1's username
 				}
 				Message msg = new Message("PLAYER", playerID + " - " + getDisplayName());
 				sendToSelf(msg);  // Send player ID to client
-//				sendToSelf("PLAYER: " + playerID + " - " + getDisplayName()); // Send player ID to client
 			} catch (Exception e) {
 				System.err.println("Error initializing client #" + count + ": " + e.getMessage());
 			}
@@ -393,7 +342,6 @@ public class Server {
 			while (true) {
 				try {
 					Object data = in.readObject();
-//					System.out.println("Client #" + count + " sent: " + data);
 
 					if (data instanceof Message message) {
 						// Handle move if the message is a move
@@ -403,8 +351,8 @@ public class Server {
 
 						if ("CHAT".equals(message.getType())) {
 							sendChatToOpponent(message);
-//							System.out.println(message.toString());
 						}
+
 						// if rematch is requested it will make new game
 						if ("REMATCH".equals(message.getType())) {
 							handleRematchRequest();
@@ -423,7 +371,6 @@ public class Server {
 								try {
 									Message msg = new Message("SERVER", this.getDisplayName() + " disconnected \nGame ended! Back to start a new game");
 									opponent.sendToSelf(msg);
-//									opponent.sendToSelf("SERVER: " + this.getDisplayName() + " disconnected \nGame ended! Back to start a new game");
 								} catch (Exception ex) {
 									ex.printStackTrace();
 								}
@@ -447,7 +394,6 @@ public class Server {
             String leaderboardData = fetchLeaderboardData();
 			Message msg = new Message("LEADERBOARD_DATA", leaderboardData);
 			sendToSelf(msg);
-//            sendToSelf("LEADERBOARD_DATA:" + leaderboardData);
 			closeConnection();
 		}
 
@@ -501,7 +447,6 @@ public class Server {
 					if (gameThread.player2 == null) {
 						Message waitMsg = new Message("ERROR", "Waiting for opponent...");
 						sendToSelf(waitMsg);
-//						sendToSelf("ERROR: Waiting for opponent");
 						return;
 					}
 
@@ -509,14 +454,12 @@ public class Server {
 					if (gameThread.game.getCurrentPlayer() != playerID) {
 						Message msg = new Message("ERROR", "Not your turn");
 						sendToSelf(msg);
-//						sendToSelf("ERROR: Not your turn");
 						return;
 					}
 
 					if (gameThread.game.getCurrentPlayer() == playerID) {
 						Message msg = new Message("SERVER", "It is your turn");
 						sendToOpponent(msg);
-//						sendToOpponent("SERVER: It is your turn");
 					}
 
 					// Make move
@@ -524,7 +467,6 @@ public class Server {
 					if (!valid) {
 						Message msg = new Message("ERROR", "Invalid move");
 						sendToSelf(msg);
-//						sendToSelf("ERROR: Invalid move");
 						return;
 					}
 
