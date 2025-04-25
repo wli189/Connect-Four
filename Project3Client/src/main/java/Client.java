@@ -87,18 +87,6 @@ public class Client extends Thread {
 		while (true) {
 			try {
 				Object obj = in.readObject();
-				// Handle login responses
-//				if (obj instanceof String message) {
-//					if (message.startsWith("LOGIN_SUCCESS:")) {
-//						Platform.runLater(() -> controller.showLoginMessage("Successfully Logged In!", true));
-//						continue;
-//					} else if (message.startsWith("LOGIN_ERROR:") || message.startsWith("USERNAME_ERROR:")) {
-//						String errorMessage = message.startsWith("LOGIN_ERROR:") ? message.substring(12) : message.substring(15);
-//						Platform.runLater(() -> controller.showLoginMessage(errorMessage, false));
-//						disconnect();
-//						break;
-//					}
-//				}
 
 				// Handle game state update
 				if (obj instanceof GameState gameState) {
@@ -144,21 +132,6 @@ public class Client extends Thread {
 						});
 					}
 				}
-//				// Handle server messages
-//				else if (obj instanceof String message) {
-//					System.out.println(message);
-//					if (message.startsWith("ERROR:") || message.startsWith("SERVER:") || message.startsWith("OPPONENT_PLAYER:") || message.startsWith("GAME_OVER:") || message.startsWith("LEADERBOARD_DATA:") || message.startsWith("LEADERBOARD_ERROR:")) {
-//						Platform.runLater(() -> {
-//							handleServerMessage(message);
-//						});
-//					} else if (message.startsWith("PLAYER:")) {
-//						Platform.runLater(() -> {
-//							synchronized (pendingMessages) {
-//								pendingMessages.add(() -> handleServerMessage(message));
-//							}
-//						});
-//					}
-//				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				break;
@@ -226,6 +199,7 @@ public class Client extends Thread {
 					player2Username = parts[1];
 					gameController.showMessage("You are Player " + playerID + " - " + this.getUsername() + "\n" + opponentPlayerUsername + " goes first", false);
 				}
+				gameController.showUsername(this.getUsername());
 			}
 			if ("LEADERBOARD_DATA".equals(message.getType())) {
 				String leaderboardData = message.toString();
