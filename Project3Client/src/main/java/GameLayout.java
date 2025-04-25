@@ -143,7 +143,6 @@ public class GameLayout {
         if (!message.isEmpty()) {
             chatOutput.appendText(client.getUsername() + ": " + message + "\n"); // Display your message
             chatInput.clear();
-//            System.out.println(client.getUsername() + ": " + message);
             client.sendUserMessage(client.getUsername() + ": " + message + "\n");
         }
     }

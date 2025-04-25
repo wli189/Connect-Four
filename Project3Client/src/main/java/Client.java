@@ -51,7 +51,8 @@ public class Client extends Thread {
 
 	public void sendLeaderboardRequest() {
 		try {
-			out.writeObject("LEADERBOARD_REQUEST");
+			Message leaderboardRequest = new Message("LEADERBOARD_REQUEST", "Requesting leaderboard");
+			out.writeObject(leaderboardRequest);
 			out.flush();
 		} catch (IOException e) {
 			System.err.println("Error sending leaderboard request: " + e.getMessage());
@@ -61,7 +62,8 @@ public class Client extends Thread {
 
 	public void sendLoginRequest() {
 		try {
-			out.writeObject("LOGIN:" + username + ":" + password);
+			Message loginRequest = new Message("LOGIN", username + ":" + password);
+			out.writeObject(loginRequest);
 			out.flush();
 		} catch (IOException e) {
 			e.printStackTrace();
@@ -86,17 +88,17 @@ public class Client extends Thread {
 			try {
 				Object obj = in.readObject();
 				// Handle login responses
-				if (obj instanceof String message) {
-					if (message.startsWith("LOGIN_SUCCESS:")) {
-						Platform.runLater(() -> controller.showLoginMessage("Successfully Logged In!", true));
-						continue;
-					} else if (message.startsWith("LOGIN_ERROR:") || message.startsWith("USERNAME_ERROR:")) {
-						String errorMessage = message.startsWith("LOGIN_ERROR:") ? message.substring(12) : message.substring(15);
-						Platform.runLater(() -> controller.showLoginMessage(errorMessage, false));
-						disconnect();
-						break;
-					}
-				}
+//				if (obj instanceof String message) {
+//					if (message.startsWith("LOGIN_SUCCESS:")) {
+//						Platform.runLater(() -> controller.showLoginMessage("Successfully Logged In!", true));
+//						continue;
+//					} else if (message.startsWith("LOGIN_ERROR:") || message.startsWith("USERNAME_ERROR:")) {
+//						String errorMessage = message.startsWith("LOGIN_ERROR:") ? message.substring(12) : message.substring(15);
+//						Platform.runLater(() -> controller.showLoginMessage(errorMessage, false));
+//						disconnect();
+//						break;
+//					}
+//				}
 
 				// Handle game state update
 				if (obj instanceof GameState gameState) {
@@ -108,23 +110,33 @@ public class Client extends Thread {
 						handleGameState(gameState);
 					});
 				}
-				// Handle chat messages
-				else if (obj instanceof Message message) {
+				// Handle messages
+				if (obj instanceof Message message) {
+					if ("LOGIN_SUCCESS".equals(message.getType())) {
+						Platform.runLater(() -> {
+							controller.showLoginMessage("Successfully Logged In!", true);
+						});
+					}
+					if ("LOGIN_ERROR".equals(message.getType()) || "USERNAME_ERROR".equals(message.getType())) {
+						String errorMessage = message.toString();
+						Platform.runLater(() -> {
+							controller.showLoginMessage(errorMessage, false);
+						});
+						disconnect();
+						break;
+					}
 					if ("CHAT".equals(message.getType())) {
 						String chatText = message.toString();
 						Platform.runLater(() -> {
 							gameController.receiveMessage(chatText);
 						});
 					}
-				}
-				// Handle server messages
-				else if (obj instanceof String message) {
-					System.out.println(message);
-					if (message.startsWith("ERROR:") || message.startsWith("SERVER:") || message.startsWith("OPPONENT_PLAYER:") || message.startsWith("GAME_OVER:") || message.startsWith("LEADERBOARD_DATA:") || message.startsWith("LEADERBOARD_ERROR:")) {
+					if ("ERROR".equals(message.getType()) || "SERVER".equals(message.getType()) || "OPPONENT_PLAYER".equals(message.getType()) || "GAME_OVER".equals(message.getType()) || "LEADERBOARD_DATA".equals(message.getType()) || "LEADERBOARD_ERROR:".equals(message.getType())) {
 						Platform.runLater(() -> {
 							handleServerMessage(message);
 						});
-					} else if (message.startsWith("PLAYER:")) {
+					}
+					if ("PLAYER".equals(message.getType())) {
 						Platform.runLater(() -> {
 							synchronized (pendingMessages) {
 								pendingMessages.add(() -> handleServerMessage(message));
@@ -132,6 +144,21 @@ public class Client extends Thread {
 						});
 					}
 				}
+//				// Handle server messages
+//				else if (obj instanceof String message) {
+//					System.out.println(message);
+//					if (message.startsWith("ERROR:") || message.startsWith("SERVER:") || message.startsWith("OPPONENT_PLAYER:") || message.startsWith("GAME_OVER:") || message.startsWith("LEADERBOARD_DATA:") || message.startsWith("LEADERBOARD_ERROR:")) {
+//						Platform.runLater(() -> {
+//							handleServerMessage(message);
+//						});
+//					} else if (message.startsWith("PLAYER:")) {
+//						Platform.runLater(() -> {
+//							synchronized (pendingMessages) {
+//								pendingMessages.add(() -> handleServerMessage(message));
+//							}
+//						});
+//					}
+//				}
 			} catch (Exception e) {
 				e.printStackTrace();
 				break;
@@ -145,9 +172,7 @@ public class Client extends Thread {
 			String status = gameState.getStatus();
 			int currentPlayer = gameState.getCurrentPlayer();
 
-//			System.out.println("Updating board in UI with: " + Arrays.deepToString(board));
 			gameController.updateBoard(board);
-//			System.out.println("Board updated in UI");
 
 			if (!gameEnded) {
 				if (status.equals("WIN")) {
@@ -176,13 +201,23 @@ public class Client extends Thread {
 		}
 	}
 
-	private void handleServerMessage(String message) {
+	private void handleServerMessage(Message message) {
 		try {
-			if (message.startsWith("ERROR:")) {
-				gameController.showMessage(message.substring(7), true);
-			} else if (message.startsWith("PLAYER:")) {
-				String[] parts = message.split(" - ", 2);
-				String id = parts[0].substring(8);
+			if ("ERROR".equals(message.getType())) {
+				gameController.showMessage(message.toString(), true);
+			}
+			if ("SERVER".equals(message.getType())) {
+				gameController.showMessage(message.toString(), false);
+			}
+			if ("OPPONENT_PLAYER".equals(message.getType())) {
+				String[] parts = message.toString().split(" - ", 2);
+				String id = parts[0];
+				opponentPlayerID = Integer.parseInt(id.trim());
+				opponentPlayerUsername = parts[1];
+			}
+			if ("PLAYER".equals(message.getType())) {
+				String[] parts = message.toString().split(" - ", 2);
+				String id = parts[0];
 				playerID = Integer.parseInt(id.trim());
 				if (playerID == 1) {
 					player1Username = parts[1];
@@ -191,22 +226,15 @@ public class Client extends Thread {
 					player2Username = parts[1];
 					gameController.showMessage("You are Player " + playerID + " - " + this.getUsername() + "\n" + opponentPlayerUsername + " goes first", false);
 				}
-				gameController.showUsername(this.getUsername());
-			} else if (message.startsWith("SERVER:")) {
-				gameController.showMessage(message.substring(8), false);
-			} else if (message.startsWith("OPPONENT_PLAYER:")) {
-				String[] parts = message.split(" - ", 2);
-				String id = parts[0].substring(17);
-				opponentPlayerID = Integer.parseInt(id.trim());
-				opponentPlayerUsername = parts[1];
-//				System.out.println("Opponent Player ID: " + opponentPlayerID + " - " + opponentPlayerUsername);
-			} else if (message.startsWith("LEADERBOARD_ERROR:")) {
-				Platform.runLater(() -> controller.showLoginMessage(message.substring(18), false));
-			} else if (message.startsWith("LEADERBOARD_DATA:")) {
-				String leaderboardData = message.substring(17);
+			}
+			if ("LEADERBOARD_DATA".equals(message.getType())) {
+				String leaderboardData = message.toString();
 				if (leaderboardController != null) {
 					leaderboardController.updateLeaderboard(leaderboardData);
 				}
+			}
+			if ("LEADERBOARD_ERROR".equals(message.getType())) {
+				Platform.runLater(() -> controller.showLoginMessage(message.toString(), false));
 			}
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -254,7 +282,6 @@ public class Client extends Thread {
 			Message rematchMessage = new Message("REMATCH", "Requesting rematch");
 			out.writeObject(rematchMessage);
 			out.flush();
-//			System.out.println("Sent rematch request to server");
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
