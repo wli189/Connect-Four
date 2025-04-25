@@ -8,6 +8,7 @@ import java.net.Socket;
 import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.Queue;
+import java.util.function.Consumer;
 
 public class Client extends Thread {
 	Socket socketClient;
@@ -25,6 +26,7 @@ public class Client extends Thread {
 	private ClientLayout controller;
 	private GameLayout gameController;
 	private final Queue<Runnable> pendingMessages = new LinkedList<>();
+	private Leaderboard leaderboardController;
 
 	public Client(ClientLayout controller) {
 		this.controller = controller;
@@ -43,17 +45,37 @@ public class Client extends Thread {
 		}
 	}
 
+	public void setLeaderboardController(Leaderboard leaderboardController) {
+		this.leaderboardController = leaderboardController;
+	}
+
+	public void sendLeaderboardRequest() {
+		try {
+			out.writeObject("LEADERBOARD_REQUEST");
+			out.flush();
+		} catch (IOException e) {
+			System.err.println("Error sending leaderboard request: " + e.getMessage());
+			Platform.runLater(() -> controller.showLoginMessage("Error sending leaderboard request!", false));
+		}
+	}
+
+	public void sendLoginRequest() {
+		try {
+			out.writeObject("LOGIN:" + username + ":" + password);
+			out.flush();
+		} catch (IOException e) {
+			e.printStackTrace();
+			Platform.runLater(() -> controller.showLoginMessage("Error sending login request!", false));
+			disconnect();
+		}
+	}
+
 	public void run() {
 		try {
 			socketClient = new Socket("127.0.0.1", 5555);
 			out = new ObjectOutputStream(socketClient.getOutputStream());
 			in = new ObjectInputStream(socketClient.getInputStream());
 			socketClient.setTcpNoDelay(true);
-			System.out.println("Client connected to server");
-
-			// Send username to server
-			out.writeObject("LOGIN:" + username + ":" + password);
-			out.flush();
 		} catch (Exception e) {
 			e.printStackTrace();
 			Platform.runLater(() -> controller.showLoginMessage("Failed to connect to server!", false));
@@ -98,7 +120,7 @@ public class Client extends Thread {
 				// Handle server messages
 				else if (obj instanceof String message) {
 					System.out.println(message);
-					if (message.startsWith("ERROR:") || message.startsWith("SERVER:") || message.startsWith("OPPONENT_PLAYER:") || message.startsWith("GAME_OVER:")) {
+					if (message.startsWith("ERROR:") || message.startsWith("SERVER:") || message.startsWith("OPPONENT_PLAYER:") || message.startsWith("GAME_OVER:") || message.startsWith("LEADERBOARD_DATA:") || message.startsWith("LEADERBOARD_ERROR:")) {
 						Platform.runLater(() -> {
 							handleServerMessage(message);
 						});
@@ -178,6 +200,13 @@ public class Client extends Thread {
 				opponentPlayerID = Integer.parseInt(id.trim());
 				opponentPlayerUsername = parts[1];
 //				System.out.println("Opponent Player ID: " + opponentPlayerID + " - " + opponentPlayerUsername);
+			} else if (message.startsWith("LEADERBOARD_ERROR:")) {
+				Platform.runLater(() -> controller.showLoginMessage(message.substring(18), false));
+			} else if (message.startsWith("LEADERBOARD_DATA:")) {
+				String leaderboardData = message.substring(17);
+				if (leaderboardController != null) {
+					leaderboardController.updateLeaderboard(leaderboardData);
+				}
 			}
 		} catch (Exception e) {
 			e.printStackTrace();

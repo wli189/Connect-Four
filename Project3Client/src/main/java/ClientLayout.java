@@ -34,6 +34,9 @@ public class ClientLayout {
     private TextField passwordInput;
 
     @FXML
+    private Label fullscreenMessage;
+
+    @FXML
     private void handleStartButtonClick() throws Exception {
         String username = usernameInput.getText().trim();
         String password = passwordInput.getText().trim();
@@ -52,9 +55,8 @@ public class ClientLayout {
         clientThread.setPassword(password);
         clientThread.start();
         GuiClient.setClient(clientThread);
-
-//        // Show connecting message
-//        showLoginMessage("Connecting to server...", true);
+        Thread.sleep(1000);
+        clientThread.sendLoginRequest();
     }
 
     private void switchToGameLayout() throws Exception {
@@ -93,26 +95,40 @@ public class ClientLayout {
     }
 
     @FXML
-    private void handleLeaderboardButton() throws IOException {
+    private void handleLeaderboardButton() throws Exception {
+        Client client = GuiClient.getClient();
+        // Create and start a new client thread
+        System.out.println("Connecting to server...");
+        client = new Client(this);
+        client.start();
+        GuiClient.setClient(client);
+        Thread.sleep(1000);
+        switchToLeaderboard();
+    }
+
+    private void switchToLeaderboard() throws Exception {
         FXMLLoader loader = new FXMLLoader(getClass().getResource("leaderboard.fxml"));
         Parent root = loader.load();
 
-        // Create a new scene
+        Leaderboard leaderboardController = loader.getController();
+        Client client = GuiClient.getClient();
+        client.setLeaderboardController(leaderboardController);
+        leaderboardController.showMessage("Loading leaderboard...", false); // Show loading message
+        client.sendLeaderboardRequest();
+
         Scene leaderboardScene = new Scene(root);
 
-        root.setOpacity(0); // Start fully transparent
-        FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), root); // 500ms duration
-        fadeTransition.setFromValue(0.0); // Start opacity
-        fadeTransition.setToValue(1.0);   // End opacity
+        root.setOpacity(0);
+        FadeTransition fadeTransition = new FadeTransition(Duration.millis(500), root);
+        fadeTransition.setFromValue(0.0);
+        fadeTransition.setToValue(1.0);
 
-        // Get current window from the button
         Stage currentStage = (Stage) leaderboardButton.getScene().getWindow();
-
-        // Set the new scene on the same stage
         currentStage.setScene(leaderboardScene);
         fadeTransition.play();
         currentStage.show();
     }
+
 
     public void showLoginMessage(String message, boolean isSuccess) {
         loginMessage.setText(message);
@@ -141,5 +157,29 @@ public class ClientLayout {
             }
         });
         fadeOut.play();
+    }
+
+    public void showMessage(String message, boolean isTrue) {
+        Platform.runLater(() -> {
+            fullscreenMessage.setText(message);
+            fullscreenMessage.setStyle("-fx-background-color: " + (!isTrue ? "rgba(0, 128, 0, 0.7)" : "rgba(255, 0, 0, 0.7)") + "; -fx-text-fill: white;");
+
+            // Fade in
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(200), fullscreenMessage);
+            fadeIn.setFromValue(0.0);
+            fadeIn.setToValue(1.0);
+            fullscreenMessage.setVisible(true);
+            fadeIn.play();
+
+            // Fade out after 2 seconds
+            FadeTransition fadeOut = new FadeTransition(Duration.millis(200), fullscreenMessage);
+            fadeOut.setFromValue(1.0);
+            fadeOut.setToValue(0.0);
+            fadeOut.setDelay(Duration.seconds(1));
+            fadeOut.setOnFinished(event -> {
+                fullscreenMessage.setVisible(false);
+            });
+            fadeOut.play();
+        });
     }
 }

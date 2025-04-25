@@ -3,6 +3,7 @@
 <?import javafx.scene.control.*?>
 <?import javafx.scene.layout.*?>
 
+<?import javafx.scene.text.Font?>
 <AnchorPane prefHeight="400.0" prefWidth="600.0" stylesheets="@styles.css" xmlns="http://javafx.com/javafx/17.0.12" xmlns:fx="http://javafx.com/fxml/1" fx:controller="Leaderboard">
     <VBox alignment="CENTER" spacing="10" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
         <Label fx:id="titleLabel" styleClass="leaderboard-title" text="Leaderboard" />
@@ -16,4 +17,9 @@
         </TableView>
         <Button fx:id="closeButton" onAction="#handleCloseButtonClick" styleClass="button-style" text="Close" />
     </VBox>
+    <Label fx:id="fullscreenMessage" alignment="CENTER" prefHeight="400.0" prefWidth="600.0" styleClass="fullscreen-message" text="" visible="false" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+        <font>
+            <Font name="Arial Bold" size="24.0" />
+        </font>
+    </Label>
 </AnchorPane>

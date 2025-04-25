@@ -211,42 +211,46 @@ public class Server {
 				connection.setTcpNoDelay(true);
 
 				Object data = in.readObject();
-				if (data instanceof String message && message.startsWith("LOGIN:")) {
-					String loginInfo = message.substring(6);
-					String[] loginInfoArr = loginInfo.split(":");
-					String requestedUsername = loginInfoArr[0];
-					String requestedPassword = loginInfoArr[1];
-					synchronized (usernames) {
-						String matchSQL = "SELECT password FROM user_records WHERE username = ?";
-						PreparedStatement pstmt = dbConnection.prepareStatement(matchSQL);
-						pstmt.setString(1, requestedUsername);
-						ResultSet rs = pstmt.executeQuery();
+				if (data instanceof String message) {
+					if (message.startsWith("LOGIN:")) {
+						String loginInfo = message.substring(6);
+						String[] loginInfoArr = loginInfo.split(":");
+						String requestedUsername = loginInfoArr[0];
+						String requestedPassword = loginInfoArr[1];
+						synchronized (usernames) {
+							String matchSQL = "SELECT password FROM user_records WHERE username = ?";
+							PreparedStatement pstmt = dbConnection.prepareStatement(matchSQL);
+							pstmt.setString(1, requestedUsername);
+							ResultSet rs = pstmt.executeQuery();
 
-						if (rs.next()) {
-							// Username exists, verify password
-							String dbPassword = rs.getString("password");
-							if (verifyCredentials(requestedUsername, requestedPassword, dbPassword)) {
-								// Check if the user has logged in
-								if (usernames.contains(requestedUsername)) {
-									sendToSelf("USERNAME_ERROR: User already login in. Please try again later or choose another username.");
+							if (rs.next()) {
+								// Username exists, verify password
+								String dbPassword = rs.getString("password");
+								if (verifyCredentials(requestedUsername, requestedPassword, dbPassword)) {
+									// Check if the user has logged in
+									if (usernames.contains(requestedUsername)) {
+										sendToSelf("USERNAME_ERROR: User already login in. Please try again later or choose another username.");
+										return false;
+									}
+									usernames.add(requestedUsername);
+									this.username = requestedUsername;
+									sendToSelf("LOGIN_SUCCESS: " + requestedUsername);
+									return true;
+								} else {
+									sendToSelf("LOGIN_ERROR: Invalid username or password.");
 									return false;
 								}
+							} else {
+								// Username doesn't exist, create new account
+								createNewUserRecord(requestedUsername, requestedPassword);
 								usernames.add(requestedUsername);
 								this.username = requestedUsername;
 								sendToSelf("LOGIN_SUCCESS: " + requestedUsername);
 								return true;
-							} else {
-								sendToSelf("LOGIN_ERROR: Invalid username or password.");
-								return false;
 							}
-						} else {
-							// Username doesn't exist, create new account
-							createNewUserRecord(requestedUsername, requestedPassword);
-							usernames.add(requestedUsername);
-							this.username = requestedUsername;
-							sendToSelf("LOGIN_SUCCESS: " + requestedUsername);
-							return true;
 						}
+					} else if (message.startsWith("LEADERBOARD_REQUEST")) {
+						handleLeaderboardRequest();
 					}
 				}
 			} catch (Exception e) {
@@ -372,6 +376,43 @@ public class Server {
 				}
 			}
 		}
+
+		private void handleLeaderboardRequest() {
+            String leaderboardData = fetchLeaderboardData();
+            sendToSelf("LEADERBOARD_DATA:" + leaderboardData);
+			closeConnection();
+		}
+
+		private void closeConnection() {
+			try {
+				if (in != null) in.close();
+				if (out != null) out.close();
+				if (connection != null) connection.close();
+			} catch (IOException e) {
+				System.err.println("Error closing connection: " + e.getMessage());
+			}
+		}
+
+		private String fetchLeaderboardData() {
+			StringBuilder data = new StringBuilder();
+			int rank = 1;
+			try {
+				String leaderboardSQL = "SELECT username, wins, losses FROM user_records ORDER BY wins DESC, losses ASC, username ASC";
+				PreparedStatement pstmt = dbConnection.prepareStatement(leaderboardSQL);
+				ResultSet rs = pstmt.executeQuery();
+				while (rs.next()) {
+					String username = rs.getString("username");
+					int wins = rs.getInt("wins");
+					int losses = rs.getInt("losses");
+					data.append(rank).append(",").append(username).append(",").append(wins).append(",").append(losses).append(";");
+					rank++;
+				}
+			} catch (SQLException e) {
+                System.err.println("Error fetching leaderboard: " + e.getMessage());
+            }
+            return data.toString();
+		}
+
 		private void sendChatToOpponent(Message message) {
 			ClientThread opponent = (playerID == 1) ? gameThread.player2 : gameThread.player1;
 			if (opponent != null) {

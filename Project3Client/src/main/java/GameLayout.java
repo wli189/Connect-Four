@@ -90,10 +90,12 @@ public class GameLayout {
             }
         }
     }
+
     private void handleColumnClick(int col) {
 //        System.out.println("Clicked column: " + col);
         GuiClient.getClient().sendMove(col);
     }
+
     // will send a message to the server for a rematch
     @FXML
     private void handleRematchButtonClick() {
@@ -142,7 +144,7 @@ public class GameLayout {
             chatOutput.appendText(client.getUsername() + ": " + message + "\n"); // Display your message
             chatInput.clear();
 //            System.out.println(client.getUsername() + ": " + message);
-            GuiClient.getClient().sendUserMessage(client.getUsername() + ": " + message + "\n");
+            client.sendUserMessage(client.getUsername() + ": " + message + "\n");
         }
     }
     public void receiveMessage(String message) {

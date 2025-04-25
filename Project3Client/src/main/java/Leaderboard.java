@@ -7,6 +7,7 @@ import javafx.fxml.FXMLLoader;
 import javafx.scene.Parent;
 import javafx.scene.Scene;
 import javafx.scene.control.Button;
+import javafx.scene.control.Label;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
 import javafx.stage.Stage;
@@ -35,8 +36,8 @@ public class Leaderboard {
     @FXML
     private Button closeButton;
 
-    static final String DB_URL = "jdbc:sqlite:../user_records.db";
-    private static Connection dbConnection;
+    @FXML
+    private Label fullscreenMessage;
 
     @FXML
     private void initialize() {
@@ -45,44 +46,8 @@ public class Leaderboard {
         usernameColumn.setCellValueFactory(cellData -> cellData.getValue().username());
         winsColumn.setCellValueFactory(cellData -> cellData.getValue().wins());
         lossesColumn.setCellValueFactory(cellData -> cellData.getValue().losses());
-
-        loadUserRecords();
     }
 
-    private void loadUserRecords() {
-        try {
-            ObservableList<UserRecord> userRecords = FXCollections.observableArrayList();
-
-            // Load SQLite JDBC driver
-            Class.forName("org.sqlite.JDBC");
-            // Connect to database
-            dbConnection = DriverManager.getConnection(DB_URL);
-            Statement stmt = dbConnection.createStatement();
-
-            // Query to fetch all user records
-            String query = """
-                            SELECT username, wins, losses FROM user_records ORDER BY wins DESC, losses ASC, username ASC
-                            """;
-            ResultSet rs = stmt.executeQuery(query);
-
-            // Add data to userRecords list
-            int rank = 1;
-            while (rs.next()) {
-                String username = rs.getString("username");
-                int wins = rs.getInt("wins");
-                int losses = rs.getInt("losses");
-                userRecords.add(new UserRecord(rank++, username, wins, losses));
-            }
-
-            // Set the items in the TableView
-            leaderboardTable.setItems(userRecords);
-
-        } catch (ClassNotFoundException e) {
-            System.err.println("SQLite JDBC driver not found: " + e.getMessage());
-        } catch (SQLException e) {
-            System.err.println("SQL Exception: " + e.getMessage());
-        }
-    }
 
     @FXML
     private void handleCloseButtonClick() throws Exception {
@@ -104,5 +69,53 @@ public class Leaderboard {
         currentStage.setScene(previousScene);
         fadeTransition.play();
         currentStage.show();
+    }
+
+    public void updateLeaderboard(String leaderboardData) {
+        System.out.println(leaderboardData);
+        ObservableList<UserRecord> records = FXCollections.observableArrayList();
+        try {
+            // Example format: "rank1,username1,wins1,losses1;rank2,username2,wins2,losses2"
+            String[] entries = leaderboardData.split(";");
+            for (String entry : entries) {
+                String[] fields = entry.split(",");
+                if (fields.length == 4) {
+                    int rank = Integer.parseInt(fields[0].trim());
+                    String username = fields[1].trim();
+                    int wins = Integer.parseInt(fields[2].trim());
+                    int losses = Integer.parseInt(fields[3].trim());
+                    records.add(new UserRecord(rank, username, wins, losses));
+                }
+            }
+            // Update the TableView on the JavaFX Application Thread
+            Platform.runLater(() -> leaderboardTable.setItems(records));
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+
+    // Show a message
+    public void showMessage(String message, boolean isError) {
+        Platform.runLater(() -> {
+            fullscreenMessage.setText(message);
+            fullscreenMessage.setStyle("-fx-background-color: " + (!isError ? "rgba(0, 128, 0, 0.7)" : "rgba(255, 0, 0, 0.7)") + "; -fx-text-fill: white;");
+
+            // Fade in
+            FadeTransition fadeIn = new FadeTransition(Duration.millis(200), fullscreenMessage);
+            fadeIn.setFromValue(0.0);
+            fadeIn.setToValue(1.0);
+            fullscreenMessage.setVisible(true);
+            fadeIn.play();
+
+            // Fade out after 2 seconds
+            FadeTransition fadeOut = new FadeTransition(Duration.millis(200), fullscreenMessage);
+            fadeOut.setFromValue(1.0);
+            fadeOut.setToValue(0.0);
+            fadeOut.setDelay(Duration.seconds(1));
+            fadeOut.setOnFinished(event -> {
+                fullscreenMessage.setVisible(false);
+            });
+            fadeOut.play();
+        });
     }
 }
