@@ -455,6 +455,11 @@ public class Server {
 
 					// Check if the game has already ended
 					if (!gameThread.isGameOngoing()) {
+						if (wantsRematch) {
+							Message rematchMsg = new Message("ERROR", "Rematching player");
+							sendToSelf(rematchMsg);
+							return;
+						}
 						System.out.println("Game is over");
 						Message msg = new Message("ERROR", "Game has ended");
 						sendToSelf(msg);
