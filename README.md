@@ -32,9 +32,9 @@ Developed a multiplayer Connect 4 game in Java using JavaFX for an interactive u
 <img width="502" alt="Connect 4 Replay" src="https://via.placeholder.com/502x300.png?text=Connect+4+Replay" />
 
 ## How to Run
-'''
+```
 git clone https://github.com/wli189/Connect-Four.git && cd Connect4-Game && mvn compile exec:java
-'''
+```
 Maven installation instructions can be found [here](https://maven.apache.org/install.html).
 
 ## Contacts
