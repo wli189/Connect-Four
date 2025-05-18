@@ -39,9 +39,16 @@ Developed a multiplayer Connect 4 game in Java using JavaFX for an interactive u
 <img width="502" alt="Connect 4 Leaderboard" src="https://github.com/user-attachments/assets/697ec901-51d8-46fa-b751-715049d7140b" />
 
 ## How to Run
+Server:
 ```
-git clone https://github.com/wli189/Connect-Four.git && cd Connect4-Game && mvn compile exec:java
+git clone https://github.com/wli189/Connect-Four.git && cd Connect-Four/Server && mvn compile exec:java
 ```
+
+Client(enable Allow multiple instances):
+```
+git clone https://github.com/wli189/Connect-Four.git && cd Connect-Four/Client && mvn compile exec:java
+```
+
 Maven installation instructions can be found [here](https://maven.apache.org/install.html).
 
 ## Contacts
