@@ -34,6 +34,9 @@ Developed a multiplayer Connect 4 game in Java using JavaFX for an interactive u
 <img width="1004" alt="Connect 4 Replay" src="https://github.com/user-attachments/assets/163864d4-c6de-404f-80d2-de3964b027d1" />
 <img width="1004" alt="Connect 4 Replay" src="https://github.com/user-attachments/assets/45395549-888f-4ce7-b4bb-70f18d011d12" />
 
+* Leaderboard displaying top players based on game statistics
+<img width="502" alt="Connect 4 Game scene" src="=https://github.com/user-attachments/assets/697ec901-51d8-46fa-b751-715049d7140b" />
+
 ## How to Run
 ```
 git clone https://github.com/wli189/Connect-Four.git && cd Connect4-Game && mvn compile exec:java
