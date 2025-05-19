@@ -15,8 +15,8 @@
 
 ## About
 **Created By:**  
-**Weito Li**
-**Helmer Axel Gomez**, 
+**Weito Li**, 
+**Helmer Axel Gomez**
 
 Developed a multiplayer Connect 4 game in Java using JavaFX for an interactive user interface. The project features a client-server architecture to enable real-time gameplay and chat functionality. The server manages game logic and stores user data in an SQLite database, while the client allows players to interact with the game board and communicate with opponents. Key features include multiplayer support, a replay option to rematch the last opponent, and a leaderboard displaying top players based on game statistics. Maven was used to manage dependencies and streamline project execution.
 
